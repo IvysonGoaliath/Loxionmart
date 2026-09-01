@@ -1,0 +1,39 @@
+.page {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 2rem 1rem;
+  background: var(--black);
+}
+.card {
+  background: var(--cream); border-radius: var(--r-xl);
+  padding: 2.25rem; width: 100%; max-width: 420px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+.header { text-align: center; margin-bottom: 2rem; }
+.logoWrap { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 1.25rem; }
+.logoImg { height: 32px; width: auto; }
+.title {
+  font-size: 1.5rem; font-weight: 900; color: var(--black);
+  letter-spacing: -0.8px; margin-bottom: 0.35rem;
+}
+.sub { font-size: 14px; color: var(--gray-mid); }
+.form { display: flex; flex-direction: column; gap: 1rem; }
+.inputWrap { position: relative; display: flex; align-items: center; }
+.inputIcon { position: absolute; left: 12px; color: var(--gray-light); pointer-events: none; }
+.eyeBtn { position: absolute; right: 10px; background: none; border: none; color: var(--gray-light); padding: 4px; display: flex; align-items: center; }
+.eyeBtn:hover { color: var(--black); }
+.checkIcon { position: absolute; right: 12px; color: var(--green); pointer-events: none; }
+.inputPadded { padding-left: 38px !important; }
+.inputPaddedRight { padding-right: 38px !important; }
+.optional { font-weight: 400; color: var(--gray-light); font-size: 12px; }
+.labelRow { display: flex; justify-content: space-between; align-items: center; }
+.forgotLink { font-size: 13px; color: var(--green); font-weight: 500; }
+.forgotLink:hover { text-decoration: underline; }
+.strengthBar { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.strengthTrack { flex: 1; height: 3px; background: var(--gray-line); border-radius: 2px; overflow: hidden; }
+.strengthFill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; }
+.strengthLabel { font-size: 11px; font-weight: 700; min-width: 50px; text-align: right; }
+.terms { font-size: 12px; color: var(--gray-mid); text-align: center; line-height: 1.6; }
+.terms a { color: var(--green); }
+.footer { text-align: center; font-size: 14px; color: var(--gray-mid); margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-line); }
+.footerLink { color: var(--black); font-weight: 700; }
+.footerLink:hover { text-decoration: underline; }

@@ -1,0 +1,44 @@
+.page { padding: 2rem 2rem 3rem; max-width: 1200px; }
+
+.tableCard { background: var(--white); border: 1px solid var(--gray-line); border-radius: var(--r-lg); overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.table th {
+  padding: 0.65rem 1rem; text-align: left; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--gray-mid); background: var(--cream); border-bottom: 1px solid var(--gray-line);
+}
+.table td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--gray-line); color: var(--gray-dark); vertical-align: middle; }
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: #fafaf9; }
+
+.bizCell { display: flex; align-items: center; gap: 10px; }
+.bizBanner { width: 36px; height: 36px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+.bizName { font-size: 14px; font-weight: 700; color: var(--black); }
+.bizSlug { font-size: 11px; color: var(--gray-light); }
+.muted { color: var(--gray-mid) !important; }
+.rate { font-weight: 700; color: var(--green); }
+
+.featBtn { background: none; border: none; display: flex; align-items: center; }
+.actions { display: flex; align-items: center; gap: 6px; }
+
+/* Modal */
+.overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 1rem; }
+.modal { background: var(--white); border-radius: var(--r-xl); width: 100%; max-width: 640px; max-height: 90vh; display: flex; flex-direction: column; box-shadow: var(--shadow-lg); }
+.modalHead { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-line); flex-shrink: 0; }
+.modalTitle { font-size: 1rem; font-weight: 800; color: var(--black); }
+.closeBtn { background: none; border: none; color: var(--gray-mid); display: flex; align-items: center; }
+.closeBtn:hover { color: var(--black); }
+.modalBody { padding: 1.5rem; overflow-y: auto; flex: 1; }
+.modalFoot { display: flex; justify-content: flex-end; gap: 10px; padding: 1.1rem 1.5rem; border-top: 1px solid var(--gray-line); flex-shrink: 0; }
+
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* Services modal */
+.svcList { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.25rem; }
+.svcRow { display: flex; align-items: center; gap: 10px; background: var(--cream); border-radius: var(--r-sm); padding: 0.65rem 0.85rem; }
+.svcEmoji { font-size: 1.3rem; }
+.svcInfo { flex: 1; }
+.svcName { font-size: 14px; font-weight: 600; color: var(--black); }
+.svcMeta { font-size: 12px; color: var(--gray-mid); }
+.svcDivider { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-mid); margin-bottom: 1rem; padding-top: 0.5rem; border-top: 1px solid var(--gray-line); }
+.emptySvc { font-size: 13px; color: var(--gray-mid); padding: 0.5rem 0; }

@@ -1,0 +1,11 @@
+.main { min-height: 80vh; padding: 2rem 0 4rem; }
+.title { font-size: 1.5rem; font-weight: 800; color: var(--black); letter-spacing: -0.5px; margin-bottom: 1.5rem; }
+.list { display: flex; flex-direction: column; gap: 12px; }
+.card { background: var(--white); border: 1px solid var(--gray-line); border-radius: var(--r-lg); padding: 1.25rem; }
+.cardHead { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.orderId { font-size: 15px; font-weight: 700; color: var(--black); }
+.orderDate { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+.items { border-top: 1px solid var(--gray-line); border-bottom: 1px solid var(--gray-line); padding: 0.75rem 0; margin-bottom: 0.75rem; display: flex; flex-direction: column; gap: 4px; }
+.item { display: flex; justify-content: space-between; font-size: 13px; color: var(--gray-dark); }
+.cardFoot { display: flex; justify-content: space-between; align-items: center; }
+.total { font-size: 14px; font-weight: 700; color: var(--black); }

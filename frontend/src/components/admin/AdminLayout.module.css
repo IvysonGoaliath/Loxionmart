@@ -1,0 +1,120 @@
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  background: var(--black);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sideTop { padding: 1.5rem 1rem; }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2rem;
+  padding: 0 0.5rem;
+}
+.brandLogo {
+  height: 22px;
+  width: auto;
+  filter: invert(1) brightness(2);
+}
+.brandTag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--green);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--r-sm);
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.5);
+  transition: all var(--transition);
+  position: relative;
+}
+.navItem:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+.navActive { background: rgba(255,255,255,0.1) !important; color: #fff !important; font-weight: 600; }
+
+.chevron {
+  margin-left: auto;
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.navActive .chevron,
+.navItem:hover .chevron { opacity: 0.4; }
+
+/* ── Sidebar bottom ── */
+.sideBot {
+  padding: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.adminInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.75rem 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.adminAvatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.adminName { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+.adminRole { font-size: 11px; color: rgba(255,255,255,0.35); }
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--r-sm);
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--transition);
+}
+.logoutBtn:hover { background: rgba(220,38,38,0.15); color: #f87171; }
+
+/* ── Main ── */
+.main { overflow-y: auto; }
+
+@media (max-width: 768px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+}

@@ -1,0 +1,71 @@
+.banner { height: 180px; display: flex; align-items: center; justify-content: center; }
+.bannerEmoji { font-size: 4.5rem; }
+
+.back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 500; color: var(--gray-mid);
+  margin: 1.5rem 0 1.25rem; transition: color var(--transition);
+}
+.back:hover { color: var(--black); }
+
+.infoCard {
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 2rem; align-items: start;
+  background: var(--white); border: 1.5px solid var(--gray-line);
+  border-radius: var(--r-xl); padding: 1.75rem;
+  margin-bottom: 2rem;
+}
+.bizCat { font-size: 13px; color: var(--gray-mid); margin-bottom: 6px; }
+.bizName {
+  font-size: 2rem; font-weight: 900; color: var(--black);
+  letter-spacing: -1px; margin-bottom: 0.6rem;
+}
+.bizMeta { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+.metaItem { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--gray-mid); }
+.bizDesc { font-size: 15px; color: var(--gray-dark); line-height: 1.65; }
+
+.infoRight { min-width: 200px; }
+.waBtn { justify-content: center; font-size: 15px !important; padding: 0.8rem !important; }
+
+.section { margin-bottom: 2.5rem; }
+.sectionTitle {
+  font-size: 1.1rem; font-weight: 800; color: var(--black);
+  letter-spacing: -0.4px; margin-bottom: 1rem;
+  padding-bottom: 0.75rem; border-bottom: 1px solid var(--gray-line);
+}
+
+.serviceGrid { display: flex; flex-direction: column; gap: 2px; }
+.serviceCard {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); border: 1px solid var(--gray-line);
+  border-radius: var(--r); padding: 1rem 1.1rem;
+  transition: border-color var(--transition);
+}
+.serviceCard:hover { border-color: var(--gray-dark); }
+.serviceLeft { display: flex; align-items: center; gap: 12px; }
+.serviceEmoji { font-size: 1.5rem; flex-shrink: 0; }
+.serviceName { font-size: 14px; font-weight: 700; color: var(--black); }
+.serviceDesc { font-size: 12px; color: var(--gray-mid); margin-top: 2px; }
+.servicePrice { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 3px; }
+
+/* ── Modal ── */
+.modalOverlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200; padding: 1rem;
+}
+.modal {
+  background: var(--white); border-radius: var(--r-xl);
+  padding: 2rem; width: 100%; max-width: 460px;
+  box-shadow: var(--shadow-lg);
+}
+.modalTitle { font-size: 1.2rem; font-weight: 800; color: var(--black); margin-bottom: 4px; }
+.modalSub { font-size: 14px; color: var(--gray-mid); margin-bottom: 1.25rem; }
+.modalForm { display: flex; flex-direction: column; gap: 1rem; }
+.modalActions { display: flex; gap: 10px; justify-content: flex-end; }
+.modalNote { font-size: 12px; color: var(--gray-light); text-align: center; }
+
+@media (max-width: 640px) {
+  .infoCard { grid-template-columns: 1fr; }
+  .bizName { font-size: 1.6rem; }
+}

@@ -1,0 +1,10 @@
+.wrap {
+  text-align: center;
+  padding: 3rem 1rem;
+  max-width: 380px;
+  margin: 0 auto;
+}
+.emoji { font-size: 3rem; margin-bottom: 1rem; }
+.title { font-size: 1.1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 0.5rem; }
+.message { font-size: 14px; color: var(--gray-500); line-height: 1.6; margin-bottom: 1.5rem; }
+.action {}

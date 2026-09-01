@@ -1,0 +1,12 @@
+import styles from './EmptyState.module.css'
+
+export default function EmptyState({ emoji = '🔍', title, message, action }) {
+  return (
+    <div className={styles.wrap}>
+      <div className={styles.emoji}>{emoji}</div>
+      <h3 className={styles.title}>{title}</h3>
+      {message && <p className={styles.message}>{message}</p>}
+      {action && <div className={styles.action}>{action}</div>}
+    </div>
+  )
+}

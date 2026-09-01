@@ -1,0 +1,51 @@
+.main { min-height: 80vh; padding-bottom: 4rem; }
+
+.header { background: var(--black); padding: 2.5rem 0 2rem; margin-bottom: 2rem; }
+.title { font-size: 1.8rem; font-weight: 900; color: var(--white); letter-spacing: -1px; }
+.sub { font-size: 14px; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+.searchWrap { margin-bottom: 1.25rem; }
+.searchBar {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--white); border: 1.5px solid var(--gray-line);
+  border-radius: var(--r); padding: 0 1rem; max-width: 520px;
+  transition: border-color var(--transition);
+}
+.searchBar:focus-within { border-color: var(--black); }
+.searchIcon { color: var(--gray-light); flex-shrink: 0; }
+.searchInput { flex: 1; border: none; outline: none; font-size: 14px; padding: 0.7rem 0; background: transparent; color: var(--black); }
+.searchInput::placeholder { color: var(--gray-light); }
+.clearBtn { background: none; border: none; color: var(--gray-mid); padding: 4px; display: flex; align-items: center; }
+.clearBtn:hover { color: var(--black); }
+
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 2rem; }
+.pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 500;
+  background: var(--white); border: 1.5px solid var(--gray-line);
+  color: var(--gray-dark); transition: all var(--transition);
+}
+.pill:hover { border-color: var(--black); color: var(--black); }
+.pillActive { background: var(--black); color: var(--white); border-color: var(--black); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+.card {
+  background: var(--white); border: 1.5px solid var(--gray-line);
+  border-radius: var(--r-lg); overflow: hidden;
+  transition: all var(--transition); display: block;
+}
+.card:hover { border-color: var(--black); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.banner { height: 90px; display: flex; align-items: center; justify-content: center; position: relative; }
+.emoji { font-size: 2.2rem; }
+.feat { position: absolute; top: 8px; right: 8px; }
+
+.body { padding: 0.9rem 1rem 1rem; }
+.cat { font-size: 11px; color: var(--gray-mid); margin-bottom: 3px; }
+.name { font-size: 15px; font-weight: 800; color: var(--black); letter-spacing: -0.3px; margin-bottom: 4px; }
+.desc { font-size: 13px; color: var(--gray-dark); line-height: 1.45; margin-bottom: 10px; }
+.foot { display: flex; align-items: center; justify-content: space-between; }
+.loc { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--gray-light); }
+.cta { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--green); }
