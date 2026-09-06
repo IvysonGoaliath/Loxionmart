@@ -4,9 +4,11 @@ from typing import List
 from datetime import datetime
 from app.core.database import get_db
 from app.models.user import User
+from app.models.business import Business
 from app.models.order import Order, OrderStatus
 from app.models.commission import Commission, CommissionStatus
 from app.schemas.user import UserOut
+from app.schemas.business import BusinessOut
 from app.routers.deps import require_admin
 from pydantic import BaseModel
 from typing import Optional
@@ -18,6 +20,13 @@ class OrderStatusUpdate(BaseModel):
 
 class CommissionStatusUpdate(BaseModel):
     status: CommissionStatus
+
+# ── Businesses ──
+@router.get("/businesses", response_model=List[BusinessOut])
+def list_admin_businesses(db: Session = Depends(get_db), admin=Depends(require_admin)):
+    """Include hidden businesses so administrators can reactivate them."""
+    return db.query(Business).order_by(Business.is_featured.desc(), Business.name).all()
+
 
 # ── Users ──
 @router.get("/users", response_model=List[UserOut])

@@ -29,10 +29,14 @@ export default function AdminBusinesses() {
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [servicesModal, setServicesModal] = useState(null)
+  const [updatingStatus, setUpdatingStatus] = useState(null)
 
   const load = () => {
     setLoading(true)
-    api.get('/businesses/').then(r => setBusinesses(r.data)).finally(() => setLoading(false))
+    api.get('/admin/businesses')
+      .then(r => setBusinesses(r.data))
+      .catch(() => toast.error('Could not load businesses. Please refresh to retry.'))
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { load() }, [])
@@ -45,6 +49,7 @@ export default function AdminBusinesses() {
       whatsapp_number: biz.whatsapp_number || '',
       banner_color: biz.banner_color, emoji: biz.emoji,
       commission_rate: biz.commission_rate, is_featured: biz.is_featured,
+      is_active: biz.is_active,
     })
     setModal(biz)
   }
@@ -82,6 +87,20 @@ export default function AdminBusinesses() {
       toast.success(biz.is_featured ? 'Removed from featured' : 'Marked as featured ⭐')
       load()
     } catch { toast.error('Update failed') }
+  }
+
+  const toggleActive = async (biz) => {
+    if (updatingStatus !== null) return
+    setUpdatingStatus(biz.id)
+    try {
+      const { data } = await api.put(`/businesses/${biz.id}`, { is_active: !biz.is_active })
+      setBusinesses(current => current.map(item => item.id === biz.id ? data : item))
+      toast.success(data.is_active ? 'Business is now visible to customers' : 'Business hidden from customers')
+    } catch {
+      toast.error('Could not change business status. Please try again.')
+    } finally {
+      setUpdatingStatus(null)
+    }
   }
 
   const f = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
@@ -131,19 +150,30 @@ export default function AdminBusinesses() {
                     </button>
                   </td>
                   <td>
-                    <span className={`badge ${biz.is_active ? 'badge-green' : 'badge-red'}`}>
-                      {biz.is_active ? 'Active' : 'Inactive'}
-                    </span>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={biz.is_active}
+                      aria-label={`Visible to customers: ${biz.name}`}
+                      title={biz.is_active ? 'Hide this business from customers' : 'Show this business to customers'}
+                      className={`btn btn-secondary btn-sm ${styles.statusBtn}`}
+                      disabled={updatingStatus !== null}
+                      aria-busy={updatingStatus === biz.id}
+                      onClick={() => toggleActive(biz)}
+                    >
+                      {biz.is_active ? <ToggleRight size={22} color="var(--green)" /> : <ToggleLeft size={22} />}
+                      {updatingStatus === biz.id ? 'Saving…' : biz.is_active ? 'Active' : 'Inactive'}
+                    </button>
                   </td>
                   <td>
                     <div className={styles.actions}>
                       <button className="btn btn-secondary btn-sm" onClick={() => setServicesModal(biz)}>
                         Services
                       </button>
-                      <button className="btn btn-secondary btn-sm" onClick={() => openEdit(biz)}>
+                      <button className="btn btn-secondary btn-sm" disabled={updatingStatus !== null} onClick={() => openEdit(biz)}>
                         <Pencil size={13} />
                       </button>
-                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(biz)}>
+                      <button className="btn btn-danger btn-sm" disabled={updatingStatus !== null || !biz.is_active} onClick={() => handleDelete(biz)}>
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -206,6 +236,12 @@ export default function AdminBusinesses() {
                   <input type="checkbox" id="featured" checked={form.is_featured} onChange={f('is_featured')} style={{ width: 16, height: 16 }} />
                   <label htmlFor="featured" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>Mark as featured ⭐</label>
                 </div>
+                {modal !== 'create' && (
+                  <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <input type="checkbox" id="business-active" checked={form.is_active} onChange={f('is_active')} style={{ width: 16, height: 16 }} />
+                    <label htmlFor="business-active" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>Active — visible to customers</label>
+                  </div>
+                )}
               </div>
             </div>
             <div className={styles.modalFoot}>
