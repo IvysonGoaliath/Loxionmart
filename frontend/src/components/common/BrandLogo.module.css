@@ -1,0 +1,2 @@
+.frame { display: inline-block; position: relative; width: 118px; height: 62px; overflow: hidden; flex-shrink: 0; mix-blend-mode: multiply; vertical-align: middle; }
+.image { position: absolute; width: 256px; max-width: none; height: 256px; left: -72px; top: -68px; }

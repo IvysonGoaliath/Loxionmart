@@ -37,3 +37,5 @@
 .footer { text-align: center; font-size: 14px; color: var(--gray-mid); margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-line); }
 .footerLink { color: var(--black); font-weight: 700; }
 .footerLink:hover { text-decoration: underline; }
+
+.page{background:var(--cream-dark);padding:40px 16px}.card{background:#fffdf9;border:1px solid var(--gray-line);max-width:470px;padding:36px;box-shadow:0 16px 48px #1111100b}.title{font-size:30px;letter-spacing:-1.2px;line-height:1.2}.logoWrap{margin-bottom:24px}.form{gap:20px}.eyeBtn{min-width:40px;min-height:40px;justify-content:center}@media(max-width:480px){.card{padding:28px 22px}.title{font-size:27px}.page{padding:24px 12px}}

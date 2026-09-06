@@ -69,3 +69,5 @@
   .infoCard { grid-template-columns: 1fr; }
   .bizName { font-size: 1.6rem; }
 }
+
+.infoCard{padding:32px;border:1px solid var(--gray-line);background:#fffdf9}.bizName{font-size:clamp(28px,4vw,44px);line-height:1.15;letter-spacing:-.045em}.serviceGrid{gap:12px}.serviceCard{padding:20px;background:#fffdf9}.serviceName{font-size:16px}.serviceDesc{font-size:13px}.sectionTitle{font-size:23px;margin-top:32px}.banner{height:150px}.modal{max-height:90vh;overflow-y:auto}@media(max-width:640px){.infoCard{padding:24px}.serviceCard{gap:12px;flex-wrap:wrap}.serviceLeft{min-width:0}}

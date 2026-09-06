@@ -49,3 +49,5 @@
 .foot { display: flex; align-items: center; justify-content: space-between; }
 .loc { display: flex; align-items: center; gap: 3px; font-size: 11px; color: var(--gray-light); }
 .cta { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--green); }
+
+.header{background:transparent;padding:56px 0 24px;margin-bottom:0}.title{color:var(--black);font-size:clamp(32px,5vw,52px);letter-spacing:-.05em;line-height:1.15}.sub{color:var(--gray-mid);margin-top:12px}.searchBar{max-width:100%;padding:8px 18px;background:#fffdf9}.searchInput{min-width:0;font-size:16px}.searchWrap{margin:16px 0 22px}.pills{padding-bottom:24px;border-bottom:1px solid var(--gray-line);gap:9px}.pill{padding:10px 15px}.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.pillActive:hover{color:white}@media(max-width:900px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.grid{grid-template-columns:1fr}.header{padding-top:32px}.pill{font-size:12px;padding:9px 12px}}

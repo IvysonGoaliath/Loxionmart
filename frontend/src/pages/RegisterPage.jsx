@@ -1,3 +1,4 @@
+import BrandLogo from '../components/common/BrandLogo'
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, User, Mail, Phone, Lock, CheckCircle } from 'lucide-react'
@@ -63,8 +64,7 @@ export default function RegisterPage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <Link to="/" className={styles.logoWrap}>
-            <div className={styles.logoIcon}>LM</div>
-            <span className={styles.logoText}>Loxion<span>Mart</span></span>
+            <BrandLogo />
           </Link>
           <h1 className={styles.title}>Create your account</h1>
           <p className={styles.sub}>Join Mzansi's local marketplace — it's free</p>

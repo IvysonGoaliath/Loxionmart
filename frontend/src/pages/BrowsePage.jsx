@@ -1,3 +1,4 @@
+import BusinessCard from '../components/common/BusinessCard'
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { Search, SlidersHorizontal, X, ArrowRight, MapPin } from 'lucide-react'
@@ -23,17 +24,20 @@ export default function BrowsePage() {
   const [params, setParams] = useSearchParams()
   const [businesses, setBusinesses] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [search, setSearch] = useState(params.get('q') || '')
 
   const activeCat = params.get('cat') || ''
 
   useEffect(() => {
     setLoading(true)
+    setError(false)
     const url = activeCat ? `/businesses/?category=${activeCat}` : '/businesses/'
-    api.get(url).then(r => setBusinesses(r.data)).finally(() => setLoading(false))
+    api.get(url).then(r => setBusinesses(r.data)).catch(() => setError(true)).finally(() => setLoading(false))
   }, [activeCat])
 
   const filtered = businesses.filter(b => {
+    if (params.get('featured') === 'true' && !b.is_featured) return false
     if (!search.trim()) return true
     const q = search.toLowerCase()
     return (
@@ -47,6 +51,7 @@ export default function BrowsePage() {
     const next = new URLSearchParams(params)
     if (cat) next.set('cat', cat); else next.delete('cat')
     next.delete('q')
+    next.delete('featured')
     setSearch('')
     setParams(next)
   }
@@ -76,13 +81,14 @@ export default function BrowsePage() {
               <Search size={16} className={styles.searchIcon} />
               <input
                 type="text"
+                aria-label="Search businesses"
                 placeholder="Search by name, service or location..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className={styles.searchInput}
               />
               {search && (
-                <button className={styles.clearBtn} onClick={clearSearch}>
+                <button aria-label="Clear search" className={styles.clearBtn} onClick={clearSearch}>
                   <X size={14} />
                 </button>
               )}
@@ -93,6 +99,7 @@ export default function BrowsePage() {
           <div className={styles.pills}>
             {CATEGORIES.map(c => (
               <button
+                aria-pressed={activeCat === c.id}
                 key={c.id}
                 className={`${styles.pill} ${activeCat === c.id ? styles.pillActive : ''}`}
                 onClick={() => setCategory(c.id)}
@@ -105,7 +112,7 @@ export default function BrowsePage() {
           {/* ── Results ── */}
           {loading ? (
             <PageLoader message="Finding businesses..." />
-          ) : filtered.length === 0 ? (
+          ) : error ? (<EmptyState emoji="" title="Businesses are taking a little longer" message="Please refresh to try again." />) : filtered.length === 0 ? (
             <EmptyState
               emoji="🔍"
               title="No businesses found"
@@ -117,7 +124,7 @@ export default function BrowsePage() {
               {filtered
                 .sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0))
                 .map(biz => (
-                  <BizCard key={biz.id} biz={biz} />
+                  <BusinessCard key={biz.id} biz={biz} />
                 ))}
             </div>
           )}
@@ -125,25 +132,5 @@ export default function BrowsePage() {
       </main>
       <Footer />
     </>
-  )
-}
-
-function BizCard({ biz }) {
-  return (
-    <Link to={`/business/${biz.slug}`} className={styles.card}>
-      <div className={styles.banner} style={{ background: biz.banner_color }}>
-        <span className={styles.emoji}>{biz.emoji}</span>
-        {biz.is_featured && <span className={`badge badge-green ${styles.feat}`}>⭐ Featured</span>}
-      </div>
-      <div className={styles.body}>
-        <div className={styles.cat}>{categoryEmoji(biz.category)} {categoryLabel(biz.category)}</div>
-        <div className={styles.name}>{biz.name}</div>
-        <div className={styles.desc}>{truncate(biz.description, 85)}</div>
-        <div className={styles.foot}>
-          <span className={styles.loc}><MapPin size={11} /> {biz.location}</span>
-          <span className={styles.cta}>View <ArrowRight size={12} /></span>
-        </div>
-      </div>
-    </Link>
   )
 }

@@ -1,3 +1,4 @@
+import BrandLogo from './BrandLogo'
 import { Link } from 'react-router-dom'
 import styles from './Footer.module.css'
 
@@ -6,7 +7,7 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={`container ${styles.inner}`}>
         <div className={styles.brand}>
-          <img src="/logo.png" alt="Loxion Mart" className={styles.logoImg} />
+          <BrandLogo />
           <p className={styles.sub}>Supporting local businesses across Mzansi.</p>
         </div>
         <div className={styles.col}>
@@ -25,18 +26,15 @@ export default function Footer() {
         </div>
         <div className={styles.col}>
           <div className={styles.colTitle}>Business</div>
-          <a href="https://wa.me/27700000000?text=Hi! I'd like to list my business on Loxion Mart."
-             target="_blank" rel="noopener noreferrer" className={styles.colLink}>
-            List your business
-          </a>
-          <Link to="/how-it-works" className={styles.colLink}>How it works</Link>
+          <Link to="/browse" className={styles.colLink}>Discover businesses</Link>
+          <a href="/#how-it-works" className={styles.colLink}>How it works</a>
         </div>
       </div>
       <div className={styles.bottom}>
         <div className="container">
           <span>© {new Date().getFullYear()} Loxion Mart · Shop Local, Shop Lekker 🇿🇦</span>
           <span className={styles.bottomRight}>
-            <Link to="/terms">Terms</Link> · <Link to="/privacy">Privacy</Link>
+            Made for the neighbourhood.
           </span>
         </div>
       </div>

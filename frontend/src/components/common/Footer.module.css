@@ -22,3 +22,5 @@
 
 @media (max-width: 768px) { .inner { grid-template-columns: 1fr 1fr; gap: 2rem; } .brand { grid-column: 1 / -1; } }
 @media (max-width: 480px) { .inner { grid-template-columns: 1fr; } }
+
+.brand>span{background:var(--cream);border-radius:4px;mix-blend-mode:normal;margin-bottom:16px}.inner{padding-top:50px;padding-bottom:40px}.sub,.colLink{color:#c7c7bf}.colTitle{color:#a9aca4}.bottom{color:#b0b2aa}.bottomRight{color:#b0b2aa}.colLink{padding:7px 0}.sub{max-width:240px}@media(max-width:480px){.inner{grid-template-columns:1fr 1fr;gap:26px}.brand{grid-column:1/-1}}

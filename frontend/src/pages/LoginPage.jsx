@@ -1,3 +1,4 @@
+import BrandLogo from '../components/common/BrandLogo'
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
@@ -42,8 +43,7 @@ export default function LoginPage() {
       <div className={styles.card}>
         <div className={styles.header}>
           <Link to="/" className={styles.logoWrap}>
-            <div className={styles.logoIcon}>LM</div>
-            <span className={styles.logoText}>Loxion<span>Mart</span></span>
+            <BrandLogo />
           </Link>
           <h1 className={styles.title}>Welcome back</h1>
           <p className={styles.sub}>Sign in to your Loxion Mart account</p>

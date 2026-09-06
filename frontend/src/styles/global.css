@@ -2,7 +2,7 @@
 
 :root {
   /* Brand */
-  --cream:     #F0EDE8;
+  --cream:     #F5F3EE;
   --cream-dark:#E8E4DD;
   --black:     #111110;
   --black-soft:#1e1e1c;
@@ -54,7 +54,7 @@ button { cursor: pointer; font-family: inherit; }
 input, select, textarea { font-family: inherit; }
 
 /* ── Container ── */
-.container { max-width: 1080px; margin: 0 auto; padding: 0 1.5rem; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
 
 /* ── Buttons ── */
 .btn {
@@ -142,3 +142,5 @@ input, select, textarea { font-family: inherit; }
   .container { padding: 0 1rem; }
   .hide-mobile { display: none !important; }
 }
+
+:focus-visible{outline:2px solid var(--green);outline-offset:4px}::selection{background:var(--green-light);color:var(--black)}.btn{min-height:42px;border-radius:10px}.btn-sm{min-height:36px}.btn-lg{min-height:50px}.form-input{min-height:46px}img{max-width:100%}#root{min-height:100vh}h1,h2,h3{text-wrap:balance}button,input,select,textarea{font-size:inherit}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}

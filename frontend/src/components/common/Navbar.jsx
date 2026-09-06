@@ -1,3 +1,4 @@
+import BrandLogo from './BrandLogo'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { ShoppingCart, User, LogOut, Settings, Menu, X } from 'lucide-react'
 import { useState } from 'react'
@@ -16,10 +17,10 @@ export default function Navbar() {
   const isActive = (path) => location.pathname === path
 
   return (
-    <nav className={styles.nav}>
+    <nav className={styles.nav} aria-label="Main navigation">
       <div className={`container ${styles.inner}`}>
         <Link to="/" className={styles.logo} onClick={() => setMenuOpen(false)}>
-          <img src="/logo.png" alt="Loxion Mart" className={styles.logoImg} />
+          <BrandLogo />
         </Link>
 
         <div className={styles.links}>
@@ -33,17 +34,17 @@ export default function Navbar() {
         </div>
 
         <div className={styles.actions}>
-          <Link to="/cart" className={styles.cartBtn}>
+          <Link to="/cart" className={styles.cartBtn} aria-label={`Shopping cart, ${count} items`}>
             <ShoppingCart size={20} />
             {count > 0 && <span className={styles.cartBadge}>{count}</span>}
           </Link>
 
           {user ? (
-            <div className={styles.userMenu}>
-              <button className={styles.userBtn}>
+            <details className={styles.userMenu}>
+              <summary className={styles.userBtn} aria-label="Account menu">
                 <User size={15} />
                 <span className="hide-mobile">{user.full_name.split(' ')[0]}</span>
-              </button>
+              </summary>
               <div className={styles.dropdown}>
                 <Link to="/my-orders"   className={styles.dropItem}>My Orders</Link>
                 <Link to="/my-bookings" className={styles.dropItem}>My Bookings</Link>
@@ -53,7 +54,7 @@ export default function Navbar() {
                   <LogOut size={13} /> Sign out
                 </button>
               </div>
-            </div>
+            </details>
           ) : (
             <div className={styles.authBtns}>
               <Link to="/login"    className="btn btn-ghost btn-sm hide-mobile">Sign in</Link>
@@ -61,7 +62,7 @@ export default function Navbar() {
             </div>
           )}
 
-          <button className={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
+          <button aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} className={styles.hamburger} onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
