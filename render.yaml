@@ -11,7 +11,7 @@ services:
     autoDeployTrigger: commit
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.9
+        value: "3.11.9"
       - key: DATABASE_URL
         fromDatabase:
           name: loxionmart-db
@@ -26,10 +26,6 @@ services:
         value: production
       - key: FRONTEND_HOST
         value: loxionmart-web.onrender.com
-        fromService:
-          name: loxionmart-web
-          type: web
-          property: host
       - key: OZOW_IS_TEST
         value: "true"
 
@@ -43,10 +39,6 @@ services:
     envVars:
       - key: VITE_API_HOST
         value: loxionmart-api.onrender.com
-        fromService:
-          name: loxionmart-api
-          type: web
-          property: host
     routes:
       - type: rewrite
         source: /*
