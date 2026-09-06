@@ -25,6 +25,7 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: FRONTEND_HOST
+        value: loxionmart-web.onrender.com
         fromService:
           name: loxionmart-web
           type: web
@@ -41,6 +42,7 @@ services:
     autoDeployTrigger: commit
     envVars:
       - key: VITE_API_HOST
+        value: loxionmart-api.onrender.com
         fromService:
           name: loxionmart-api
           type: web
