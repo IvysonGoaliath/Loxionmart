@@ -17,7 +17,7 @@ from app.models.user import User, UserRole
 from app.models.business import Business, BusinessCategory
 from app.models.service import Service, ServiceType
 from app.models.mall import MediaAsset
-from app.routers import catalogue, merchant, saved, media, businesses, bookings, orders, services
+from app.routers import catalogue, merchant, saved, media, businesses, bookings, orders, services, admin
 
 class OnlineMallTests(unittest.TestCase):
     def setUp(self):
@@ -33,7 +33,7 @@ class OnlineMallTests(unittest.TestCase):
             db.add_all([Service(id=1,business_id=1,name="Test Phone",price=999,service_type=ServiceType.PRODUCT,image_urls=["https://example.com/phone.jpg"],specifications={"Storage":"128 GB"},stock_quantity=4),Service(id=2,business_id=1,name="Phone Setup",price=100,service_type=ServiceType.BOOKING,duration_minutes=30),Service(id=3,business_id=1,name="Hidden Listing",price=1,service_type=ServiceType.PRODUCT,is_available=False),Service(id=4,business_id=2,name="Private Product",price=2,service_type=ServiceType.PRODUCT),Service(id=5,business_id=1,name="Out of Stock",price=20,service_type=ServiceType.PRODUCT,stock_quantity=0)])
             db.commit()
         app=FastAPI()
-        for module in (catalogue,merchant,saved,media,businesses,bookings,orders,services):app.include_router(module.router,prefix="/api")
+        for module in (catalogue,merchant,saved,media,businesses,bookings,orders,services,admin):app.include_router(module.router,prefix="/api")
         def database():
             with self.sessions() as db:yield db
         app.dependency_overrides[get_db]=database
@@ -91,6 +91,65 @@ class OnlineMallTests(unittest.TestCase):
         self.assertIsNone(r.json()["stock_quantity"])
         self.assertEqual(self.client.post("/api/merchant/shops/1/items",headers=self.auth(2),json={"name":"Bad image","price":2,"image_urls":["javascript:alert(1)"]}).status_code,422)
         self.assertEqual(self.client.post("/api/merchant/shops/1/items",headers=self.auth(2),json={"name":"Bad price","price":-2}).status_code,422)
+    def test_rejection_reason_reaches_owner_and_resubmission_returns_to_review(self):
+        for note in [None, "", "   "]:
+            payload = {"decision": "rejected"}
+            if note is not None:
+                payload["note"] = note
+            response = self.client.put("/api/merchant/applications/2", headers=self.auth(1), json=payload)
+            self.assertEqual(response.status_code, 422, response.text)
+        self.assertEqual(self.client.get("/api/merchant/shops/2", headers=self.auth(3)).json()["approval_status"], "pending")
+        reason = "Please describe the products you sell and add collection information."
+        response = self.client.put("/api/merchant/applications/2", headers=self.auth(1), json={"decision":"rejected", "note":"  " + reason + "  "})
+        self.assertEqual(response.status_code, 200, response.text)
+        owner_shop = self.client.get("/api/merchant/shops/2", headers=self.auth(3)).json()
+        self.assertEqual(owner_shop["approval_status"], "rejected")
+        self.assertEqual(owner_shop["review_note"], reason)
+        self.assertFalse(owner_shop["is_active"])
+        self.assertEqual(self.client.get("/api/catalogue/4").status_code, 404)
+        self.assertEqual(self.client.post("/api/merchant/shops/2/resubmit", headers=self.auth(2)).status_code, 404)
+        response = self.client.post("/api/merchant/shops/2/resubmit", headers=self.auth(3))
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()["approval_status"], "pending")
+        self.assertFalse(response.json()["is_active"])
+        self.assertIsNone(response.json()["review_note"])
+        approved = self.client.put("/api/merchant/applications/2", headers=self.auth(1), json={"decision":"approved", "note":"Ready to join the mall."})
+        self.assertEqual(approved.status_code, 200, approved.text)
+        self.assertTrue(approved.json()["is_active"])
+        self.assertEqual(self.client.get("/api/catalogue/4").status_code, 200)
+
+    def test_admin_business_list_exposes_review_status_and_visibility_cannot_approve(self):
+        response = self.client.get("/api/admin/businesses", headers=self.auth(1))
+        self.assertEqual(response.status_code, 200, response.text)
+        pending = next(shop for shop in response.json() if shop["id"] == 2)
+        self.assertEqual(pending["approval_status"], "pending")
+        self.assertIn("review_note", pending)
+        self.assertEqual(self.client.get("/api/admin/businesses", headers=self.auth(3)).status_code, 403)
+        response = self.client.put("/api/businesses/2", headers=self.auth(1), json={"is_active": True})
+        self.assertEqual(response.status_code, 409, response.text)
+        self.assertEqual(self.client.get("/api/merchant/shops/2", headers=self.auth(3)).json()["approval_status"], "pending")
+        for active in [False, True]:
+            response = self.client.put("/api/businesses/1", headers=self.auth(1), json={"is_active": active})
+            self.assertEqual(response.status_code, 200, response.text)
+            self.assertEqual(response.json()["is_active"], active)
+        self.assertEqual(self.client.get("/api/merchant/shops/1", headers=self.auth(2)).json()["approval_status"], "approved")
+
+    def test_admin_application_filters_include_completed_owner_applications(self):
+        with self.sessions() as db:
+            db.add(Business(name="Admin-created shop", slug="admin-created", category=BusinessCategory.OTHER, is_active=True, approval_status="approved"))
+            db.commit()
+        def ids(status):
+            response = self.client.get("/api/merchant/applications", params={"status": status}, headers=self.auth(1))
+            self.assertEqual(response.status_code, 200, response.text)
+            return {shop["id"] for shop in response.json()}
+        self.assertEqual(ids("pending"), {2})
+        self.assertEqual(ids("approved"), {1})
+        self.assertEqual(ids("rejected"), set())
+        self.client.put("/api/merchant/applications/2", headers=self.auth(1), json={"decision":"rejected", "note":"Please add a shop description."})
+        self.assertEqual(ids("pending"), set())
+        self.assertEqual(ids("rejected"), {2})
+        self.assertEqual(self.client.get("/api/merchant/applications?status=unknown", headers=self.auth(1)).status_code, 422)
+        self.assertEqual(self.client.get("/api/merchant/applications?status=approved", headers=self.auth(3)).status_code, 403)
     def test_saved_collections_are_persistent_idempotent_and_user_scoped(self):
         body={"kind":"item","target_id":1}
         for _ in range(2):self.assertEqual(self.client.put("/api/saved",headers=self.auth(4),json=body).status_code,201)

@@ -22,6 +22,7 @@ const EMPTY_FORM = {
   whatsapp_number: '', banner_color: '#1e1e1c', emoji: '🏪',
   commission_rate: 0.10, is_featured: false,
 }
+const REVIEW_LABELS = { pending: 'In review', approved: 'Approved', rejected: 'Rejected' }
 
 export default function AdminBusinesses() {
   const [businesses, setBusinesses] = useState([])
@@ -50,7 +51,7 @@ export default function AdminBusinesses() {
       whatsapp_number: biz.whatsapp_number || '',
       banner_color: biz.banner_color, emoji: biz.emoji,
       commission_rate: biz.commission_rate, is_featured: biz.is_featured,
-      is_active: biz.is_active,
+      is_active: biz.approval_status === 'approved' && biz.is_active,
     })
     setModal(biz)
   }
@@ -95,7 +96,7 @@ export default function AdminBusinesses() {
     setUpdatingStatus(biz.id)
     try {
       const { data } = await api.put(`/businesses/${biz.id}`, { is_active: !biz.is_active })
-      setBusinesses(current => current.map(item => item.id === biz.id ? data : item))
+      setBusinesses(current => current.map(item => item.id === biz.id ? { ...item, ...data } : item))
       toast.success(data.is_active ? 'Business is now visible to customers' : 'Business hidden from customers')
     } catch {
       toast.error('Could not change business status. Please try again.')
@@ -111,8 +112,13 @@ export default function AdminBusinesses() {
       <AdminPageHeader
         title="Businesses"
         sub={`${businesses.length} businesses listed on Loxion Mart`}
-        action={<button className="btn btn-primary" onClick={openCreate}><Plus size={15} /> Add business</button>}
+        action={<div className={styles.headerActions}><Link className="btn btn-secondary" to="/admin/applications">Shop applications</Link><button className="btn btn-primary" onClick={openCreate}><Plus size={15} /> Add business</button></div>}
       />
+
+      {!loading && businesses.some(biz => biz.approval_status === 'pending') && <div className={styles.reviewNotice}>
+        <div><strong>{businesses.filter(biz => biz.approval_status === 'pending').length} shop application(s) waiting for review</strong><p>Open each application to approve it or reject it with feedback for the owner.</p></div>
+        <Link to="/admin/applications" className="btn btn-primary">Review applications</Link>
+      </div>}
 
       {loading ? <PageLoader /> : (
         <div className={styles.tableCard}>
@@ -124,7 +130,8 @@ export default function AdminBusinesses() {
                 <th>Location</th>
                 <th>Commission</th>
                 <th>Featured</th>
-                <th>Status</th>
+                <th>Application</th>
+                <th>Visibility</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -137,6 +144,7 @@ export default function AdminBusinesses() {
                       <div>
                         <div className={styles.bizName}>{biz.name}</div>
                         <div className={styles.bizSlug}>/{biz.slug}</div>
+                        {biz.approval_status !== 'approved' && <Link className={styles.reviewShopLink} to={`/admin/applications/${biz.id}`}>Review application →</Link>}
                       </div>
                     </div>
                   </td>
@@ -151,6 +159,10 @@ export default function AdminBusinesses() {
                     </button>
                   </td>
                   <td>
+                    <span className={`mall-status ${biz.approval_status}`}>{REVIEW_LABELS[biz.approval_status] || 'Review required'}</span>
+                  </td>
+                  <td>
+                    {biz.approval_status === 'approved' ?
                     <button
                       type="button"
                       role="switch"
@@ -164,7 +176,7 @@ export default function AdminBusinesses() {
                     >
                       {biz.is_active ? <ToggleRight size={22} color="var(--green)" /> : <ToggleLeft size={22} />}
                       {updatingStatus === biz.id ? 'Saving…' : biz.is_active ? 'Active' : 'Inactive'}
-                    </button>
+                    </button> : <span className={styles.muted}>Private until approved</span>}
                   </td>
                   <td>
                     <div className={styles.actions}>
@@ -235,12 +247,13 @@ export default function AdminBusinesses() {
                   <input type="checkbox" id="featured" checked={form.is_featured} onChange={f('is_featured')} style={{ width: 16, height: 16 }} />
                   <label htmlFor="featured" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>Mark as featured ⭐</label>
                 </div>
-                {modal !== 'create' && (
+                {modal !== 'create' && modal.approval_status === 'approved' && (
                   <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     <input type="checkbox" id="business-active" checked={form.is_active} onChange={f('is_active')} style={{ width: 16, height: 16 }} />
                     <label htmlFor="business-active" className="form-label" style={{ marginBottom: 0, cursor: 'pointer' }}>Active — visible to customers</label>
                   </div>
                 )}
+                {modal !== 'create' && modal.approval_status !== 'approved' && <p className={styles.muted}>This shop needs an application decision before it can be visible. <Link className={styles.reviewShopLink} to={`/admin/applications/${modal.id}`}>Review application →</Link></p>}
               </div>
             </div>
             <div className={styles.modalFoot}>

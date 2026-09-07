@@ -1,5 +1,5 @@
 from typing import Optional, Literal, List
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.models.business import BusinessCategory
 from .business import BusinessOut, ShopPresentation
 from .service import ServiceOut
@@ -48,8 +48,15 @@ class ManagedShop(BusinessOut):
     owner_id: Optional[int] = None
 
 class ShopReview(BaseModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     decision: Literal["approved", "rejected"]
     note: str = Field(default="", max_length=1500)
+
+    @model_validator(mode="after")
+    def rejection_requires_reason(self):
+        if self.decision == "rejected" and not self.note:
+            raise ValueError("Explain why the application is rejected so the owner can address it.")
+        return self
 
 class SaveRequest(BaseModel):
     kind: Literal["item", "shop"]

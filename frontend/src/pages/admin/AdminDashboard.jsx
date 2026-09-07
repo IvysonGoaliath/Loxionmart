@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { Store, ShoppingBag, Calendar, TrendingUp, Users, Activity } from 'lucide-react'
 import StatCard from '../../components/admin/StatCard'
 import AdminPageHeader from '../../components/admin/AdminPageHeader'
@@ -50,6 +51,7 @@ export default function AdminDashboard() {
       <AdminPageHeader
         title="Dashboard"
         sub="Welcome back — here's what's happening on Loxion Mart"
+        action={<Link className="btn btn-primary" to="/admin/applications">Review shop applications</Link>}
       />
 
       {/* Stats */}

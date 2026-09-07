@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from typing import Literal, Optional
 from sqlalchemy.orm import Session, selectinload
 from app.core.database import get_db
 from app.models.business import Business
@@ -75,8 +76,16 @@ def edit_item(shop_id: int, item_id: int, data: ServiceUpdate, db: Session = Dep
     return item
 
 @router.get("/applications", response_model=list[ManagedShop])
-def applications(db: Session = Depends(get_db), admin=Depends(require_admin)):
-    return db.query(Business).options(selectinload(Business.services)).filter(Business.approval_status != "approved").order_by(Business.created_at).all()
+def applications(status: Optional[Literal["pending", "approved", "rejected"]] = None,
+                 db: Session = Depends(get_db), admin=Depends(require_admin)):
+    query = db.query(Business).options(selectinload(Business.services))
+    if status:
+        query = query.filter(Business.approval_status == status)
+        if status == "approved":
+            query = query.filter(Business.owner_id.isnot(None))
+    else:
+        query = query.filter(Business.approval_status != "approved")
+    return query.order_by(Business.created_at).all()
 
 @router.put("/applications/{shop_id}", response_model=ManagedShop)
 def review(shop_id: int, data: ShopReview, db: Session = Depends(get_db), admin=Depends(require_admin)):
@@ -95,7 +104,6 @@ def shop_bookings(shop_id: int, db: Session = Depends(get_db), user=Depends(get_
     return [{"id":b.id,"status":b.status,"preferred_date":b.preferred_date,"notes":b.notes,"client_name":b.client.full_name,"service_name":b.service.name if b.service else None} for b in rows]
 
 from pydantic import BaseModel
-from typing import Literal
 class MerchantBookingUpdate(BaseModel):
     status: Literal["confirmed", "completed", "cancelled"]
 

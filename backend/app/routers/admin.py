@@ -8,7 +8,7 @@ from app.models.business import Business
 from app.models.order import Order, OrderStatus
 from app.models.commission import Commission, CommissionStatus
 from app.schemas.user import UserOut
-from app.schemas.business import BusinessOut
+from app.schemas.mall import ManagedShop
 from app.routers.deps import require_admin
 from pydantic import BaseModel
 from typing import Optional
@@ -22,9 +22,9 @@ class CommissionStatusUpdate(BaseModel):
     status: CommissionStatus
 
 # ── Businesses ──
-@router.get("/businesses", response_model=List[BusinessOut])
+@router.get("/businesses", response_model=List[ManagedShop])
 def list_admin_businesses(db: Session = Depends(get_db), admin=Depends(require_admin)):
-    """Include hidden businesses so administrators can reactivate them."""
+    """Include hidden shops and their review status for administrator decisions."""
     return db.query(Business).order_by(Business.is_featured.desc(), Business.name).all()
 
 

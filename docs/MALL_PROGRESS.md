@@ -4,7 +4,19 @@
 An online shopping mall for local South African businesses. One customer account, many shops, real products and bookable services. Motto: **Shop Local, Shop Lekker!** Keep it prominent in the home page and shared brand/navigation. Preserve the Canva Loxion Mart logo, black/cream/green identity, GitHub repo and Render setup. Ozow/payment activation is deferred until Ivyson has the business bank account.
 
 ## Current batch: online mall foundation
-Status: implementation complete and tested; saved on mall-foundation at 0d0d82e75f9225b1ede56bf1c0e10aaad47b70af. PRODUCTION PUBLICATION BLOCKED pending explicit approval. Working branch: `mall-foundation`. Starting main commit: `363fb106ed260bfae08ee3707889567fb3c2d25a`.
+Status: LIVE on Render. Ivyson explicitly approved production deployment and additive migration 0003. PR #1 merged into main as `fa1c1303c87a81b89f13e8ec42f0b0718a5c21e7` on 2026-09-07. Both frontend and API deployments report success; read-only production checks passed. Implementation commit: `0d0d82e75f9225b1ede56bf1c0e10aaad47b70af`. Starting main commit: `363fb106ed260bfae08ee3707889567fb3c2d25a`. Payments remain disabled.
+
+## Current repair: shop application review
+Ivyson reported that applicants see In review while the administrator can only find the active/inactive toggle. Root causes: the admin sidebar was hidden below 768px with no mobile replacement; the business list omitted application status and review links; the existing review page labelled rejection only as Request changes.
+
+Implemented on top of `fa1c1303c87a81b89f13e8ec42f0b0718a5c21e7`:
+- Mobile admin navigation with a visible Shop applications shortcut, plus review links on the dashboard, business list and admin shop workspace.
+- `/admin/applications` filters for In review, Rejected and Approved; `/admin/applications/:id` for a complete application and decision controls.
+- Explicit Approve & publish shop and Reject application actions. Rejection reason is trimmed and required in both frontend and backend. Existing feedback stays visible in the application record; owners see it and can update/resubmit.
+- Admin business responses include review status. Application and visibility are distinct columns; pending/rejected shops link directly to review. A visibility update cannot approve a shop; the API rejects activation until approval.
+- No migration or new external service. Payment configuration is unchanged and disabled. Real shop decisions are left to Ivyson.
+
+Validation: 16 backend regression tests passed, including 3 new end-to-end API tests for rejection feedback/resubmission, decision/visibility separation and completed application filters. Production Vite build passed (local JS `index-Iy1R_Z3p.js`, CSS `index-Ct1MxOii.css`; deployment environment can change the JS hash). `git diff --check` passed. Browser interaction/visual QA has not been run. Publication verification is the remaining step for this repair.
 
 Deliver this complete batch:
 - Product/service catalogue with query, type, category, location, price, availability, sorting and pagination.
@@ -44,7 +56,7 @@ Payment onboarding/settlements/refunds; stock reservation and variant-specific s
 ## Validation evidence
 - 13 backend tests passed: existing admin visibility, catalogue/directory queries, pending/hidden shop exclusions, ownership/admin access, application-to-public flow, partial item updates, safe image URLs, saved isolation/idempotency, media roundtrip/size/type/ownership, booking ownership/transitions and payment gate.
 - 3 frontend basket tests passed: cross-shop totals/removal, stock/type restrictions, and legacy cart migration.
-- Production Vite build passed. PostgreSQL migration SQL generated successfully for 0002 → 0003; a local PostgreSQL server was unavailable, so execution against PostgreSQL must be confirmed by Render deployment and read-only endpoint checks.
+- Production Vite build passed. PostgreSQL migration SQL generated successfully for 0002 → 0003. A local PostgreSQL server was unavailable. Render subsequently completed its migration/start command successfully, and production catalogue/shop queries returned the new fields without database errors.
 - Browser interaction/visual QA has not been run. User did not request browser QA; do not claim it passed.
 
 ## Business inputs still needed after release
@@ -60,5 +72,21 @@ Add actual product/service photos and specifications for real shops through Admi
 W3C form labels and feedback: https://www.w3.org/WAI/tutorials/forms/ . Image sizing/loading: https://web.dev/learn/images/performance-issues . Applied as implementation guidance, not a claim of audited compliance. The mall storefront illustration is original generated brand artwork, served as a ~92 KB WebP; it is not photography of actual participating shops or inventory.
 
 
-## Publication approval blocker
-Automatic approval review rejected updating `main` to the mall foundation commit because the production branch triggers Render deployment and migration 0003, and it requires explicit approval for that exact action. The implementation is safely pushed on `mall-foundation`; main remains `363fb106ed260bfae08ee3707889567fb3c2d25a`. Do not retry or merge indirectly until Ivyson explicitly approves deployment of this batch and its additive database migration. A draft pull request makes the full changes reviewable. After approval, merge/update main with a non-forced operation, verify the Render API and frontend, then update this checkpoint with the result.
+## Production release and continuation (2026-09-07)
+The earlier automatic approval blocker is resolved: after being asked explicitly about deploying this update and its database migration, Ivyson replied, "Yes, I approve!" PR #1 was marked ready and merged normally with an expected-head SHA check. No forced branch update was used.
+
+- Release commit: `fa1c1303c87a81b89f13e8ec42f0b0718a5c21e7`; PR: https://github.com/IvysonGoaliath/Loxionmart/pull/1 .
+- Render frontend deployment `6301974991` reported success at 04:29:23 UTC; API deployment `6301988745` reported success at 04:32:08 UTC. These are GitHub deployment IDs, not Render service IDs.
+- Production `/api/health` returned HTTP 200, status ok, environment production.
+- `/api/catalogue?page_size=1` returned HTTP 200 with 12 public listings and the new image/specification/stock/duration/business fields; `/api/catalogue/shops?page_size=1` returned HTTP 200 with 2 public shops and their new branding/fulfilment fields. Counts describe this verification snapshot, not a marketing claim.
+- `/api/mall-config` returned `{"payments_enabled":false}`. Do not activate Ozow or payments before the deferred business and engineering work.
+- Anonymous requests to `/api/saved` and `/api/merchant/shops` returned HTTP 403 as expected; authenticated ownership behaviour is covered by the local regression suite. No customer account, booking, order or upload was created during production verification.
+- API CORS headers allow the actual frontend origin `https://loxionmart-web.onrender.com`.
+- Frontend `/mall` and `/sell` returned HTTP 200. Served bundle `/assets/index-XPLXtcTi.js` contains the restored motto, Local Explorer, saved/merchant routes and correct public API hostname. Original mall artwork returned HTTP 200 as a valid 93,916-byte WebP.
+- Production verification was read-only HTTP and deployment-status inspection. Browser interaction/visual QA remains unperformed; do not claim otherwise.
+- The intended documentation-only checkpoint commit uses `[skip render]` to avoid another application deployment (Render reference: https://render.com/docs/deploys#skipping-an-auto-deploy).
+
+### Checkpoint sync still pending
+The application release is live, but the subsequent GitHub update of this file was rejected by automatic approval review because its usage limit was reached. The rejection was not a deployment failure. Ivyson confirmed approval again; this does not remove a service usage limit. This updated file is available locally for the handoff. Remote main remains the successful release commit above, with the older checkpoint text. Once normal tool availability returns, fetch main and the current blob SHA, sync this updated checkpoint with a documentation-only `[skip render]` commit, and do not redeploy or rerun the migration just to update these notes.
+
+Resume from current `main`, not the old working-tree baseline. The next useful batch is real merchant catalogue content and, if requested, a single complete customer/owner/admin browser walkthrough. Follow the engineering milestones above after addressing real findings. Preserve the motto, existing Canva Mart logo, approved records and deferred payment decision.

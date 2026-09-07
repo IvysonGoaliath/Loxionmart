@@ -59,6 +59,8 @@ def update_business(id: int, data: BusinessUpdate, db: Session = Depends(get_db)
     biz = db.query(Business).filter(Business.id == id).first()
     if not biz:
         raise HTTPException(status_code=404, detail="Business not found")
+    if data.is_active is True and biz.approval_status != "approved":
+        raise HTTPException(status_code=409, detail="Approve this shop in Shop applications before making it active.")
     for k, v in data.model_dump(exclude_none=True).items():
         setattr(biz, k, v)
     db.commit()
