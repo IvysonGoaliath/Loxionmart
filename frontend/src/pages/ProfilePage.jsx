@@ -32,7 +32,7 @@ export default function ProfilePage() {
   return (
     <>
       <Navbar />
-      <main className={styles.main}>
+      <main id="mall-content" className={styles.main}>
         <div className="container">
           <div className={styles.header}>
             <div className={styles.avatar}>

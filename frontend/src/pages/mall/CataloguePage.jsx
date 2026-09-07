@@ -1,0 +1,26 @@
+import { useState, useEffect } from 'react'
+import { useSearchParams, Link } from 'react-router-dom'
+import { Search, X, SlidersHorizontal } from 'lucide-react'
+import Navbar from '../../components/common/Navbar'
+import Footer from '../../components/common/Footer'
+import ItemCard from '../../components/mall/ItemCard'
+import AsyncState from '../../components/mall/AsyncState'
+import { categories } from '../../utils/mall'
+import api from '../../utils/api'
+export default function CataloguePage() {
+  const [params,setParams] = useSearchParams(), [data,setData] = useState({items:[],total:0}), [state,setState] = useState('loading'), [retry,setRetry] = useState(0)
+  const [query,setQuery] = useState(params.get('q')||'')
+  const key=params.toString(), page=Number(params.get('page'))||1
+  useEffect(()=>{setQuery(params.get('q')||'')},[key])
+  useEffect(()=>{const controller=new AbortController();setState('loading');api.get(`/catalogue?${key}`,{signal:controller.signal}).then(r=>{setData(r.data);setState('ready')}).catch(e=>{if(e.code!=='ERR_CANCELED')setState('error')});return()=>controller.abort()},[key,retry])
+  function change(values){const next=new URLSearchParams(params);next.delete('page');Object.entries(values).forEach(([k,v])=>v?next.set(k,v):next.delete(k));setParams(next)}
+  const kind=params.get('kind')||''
+  return <><Navbar/><main id="mall-content" className="container mall-main"><div className="mall-page-heading"><span className="mall-eyebrow">THE MALL CATALOGUE</span><h1>{params.get('q')?`Results for “${params.get('q')}”`:kind==='booking'?'Find your next great service.':kind==='product'?'Something local, just for you.':'Find it in your local mall.'}</h1><p>Explore products and services from shops across the mall.</p></div>
+  <div className="mall-tablinks"><button aria-pressed={!kind} className={!kind?'selected':''} onClick={()=>change({kind:''})}>Everything</button><button aria-pressed={kind==='product'} className={kind==='product'?'selected':''} onClick={()=>change({kind:'product'})}>Products</button><button aria-pressed={kind==='booking'} className={kind==='booking'?'selected':''} onClick={()=>change({kind:'booking'})}>Services</button><Link to={`/browse${params.get('q')?'?q='+encodeURIComponent(params.get('q')):''}`}>Find a shop</Link></div>
+  <form className="mall-catalogue-search" onSubmit={e=>{e.preventDefault();change({q:query.trim()})}}><Search size={20}/><input aria-label="Search products and services" placeholder="Try a product, service, brand or shop…" value={query} onChange={e=>setQuery(e.target.value)}/><button className="btn btn-primary" type="submit">Search</button></form>
+  <div className="mall-filters"><label>Department<select value={params.get('category')||''} onChange={e=>change({category:e.target.value})}><option value="">All departments</option>{categories.map(c=><option key={c.id} value={c.id}>{c.label}</option>)}</select></label><label>Location<input key={params.get('location')||'location'} placeholder="Town or area" defaultValue={params.get('location')||''} onBlur={e=>{if(e.target.value!==(params.get('location')||''))change({location:e.target.value.trim()})}} onKeyDown={e=>{if(e.key==='Enter')e.currentTarget.blur()}}/></label><label>Min price (R)<input key={'min'+(params.get('min_price')||'')} type="number" min="0" defaultValue={params.get('min_price')||''} placeholder="Any" onBlur={e=>{if(e.target.value!==(params.get('min_price')||''))change({min_price:e.target.value})}}/></label><label>Max price (R)<input key={'max'+(params.get('max_price')||'')} type="number" min="0" defaultValue={params.get('max_price')||''} placeholder="Any" onBlur={e=>{if(e.target.value!==(params.get('max_price')||''))change({max_price:e.target.value})}}/></label><label>Sort by<select value={params.get('sort')||'newest'} onChange={e=>change({sort:e.target.value})}><option value="newest">Newest arrivals</option><option value="price_asc">Price: low to high</option><option value="price_desc">Price: high to low</option><option value="name">Name: A to Z</option></select></label></div>
+  <div className="mall-results-bar"><span role="status">{state==='loading'?'Searching…':`${data.total} listing${data.total===1?'':'s'}`}</span><label className="mall-check"><input type="checkbox" checked={params.get('available')==='true'} onChange={e=>change({available:e.target.checked?'true':''})}/>Available now</label>{key&&<button className="mall-text-link" onClick={()=>setParams({})}><X size={15}/>Clear filters</button>}</div>
+  <AsyncState loading={state==='loading'} error={state==='error'} empty={!data.items.length} retry={()=>setRetry(x=>x+1)}><div className="mall-item-grid">{data.items.map((item,i)=><ItemCard key={item.id} item={item} eager={i<4}/>)}</div></AsyncState>
+  {state==='ready'&&data.total>24&&<nav className="mall-pagination" aria-label="Catalogue pages"><button className="btn btn-secondary" disabled={page<=1} onClick={()=>{setParams(p=>{p.set('page',String(page-1));return p});window.scrollTo({top:0})}}>Previous</button><span>Page {page} of {Math.ceil(data.total/24)}</span><button className="btn btn-secondary" disabled={page*24>=data.total} onClick={()=>{setParams(p=>{p.set('page',String(page+1));return p});window.scrollTo({top:0})}}>Next</button></nav>}
+  </main><Footer/></>
+}

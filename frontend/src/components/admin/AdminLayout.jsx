@@ -8,6 +8,7 @@ import styles from './AdminLayout.module.css'
 
 const NAV = [
   { to: '/admin',              label: 'Dashboard',   icon: LayoutDashboard, end: true },
+  { to: '/admin/applications', label: 'Shop applications', icon: Store },
   { to: '/admin/businesses',   label: 'Businesses',  icon: Store },
   { to: '/admin/orders',       label: 'Orders',      icon: ShoppingBag },
   { to: '/admin/bookings',     label: 'Bookings',    icon: Calendar },

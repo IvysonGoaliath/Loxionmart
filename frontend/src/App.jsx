@@ -3,6 +3,13 @@ import { ProtectedRoute, AdminRoute, GuestRoute } from './components/common/Prot
 import AdminLayout from './components/admin/AdminLayout'
 
 // Public pages
+import { SavedProvider } from './components/mall/SavedProvider'
+import CataloguePage from './pages/mall/CataloguePage'
+import ItemPage from './pages/mall/ItemPage'
+import SavedPage from './pages/mall/SavedPage'
+import SellPage from './pages/mall/SellPage'
+import MerchantPage from './pages/mall/MerchantPage'
+import AdminApplications from './pages/admin/AdminApplications'
 import HomePage        from './pages/HomePage'
 import BrowsePage      from './pages/BrowsePage'
 import BusinessPage    from './pages/BusinessPage'
@@ -28,18 +35,24 @@ import AdminUsers        from './pages/admin/AdminUsers'
 
 export default function App() {
   return (
-    <Routes>
+    <SavedProvider><Routes>
       {/* Public */}
       <Route path="/"               element={<HomePage />} />
       <Route path="/browse"         element={<BrowsePage />} />
       <Route path="/business/:slug" element={<BusinessPage />} />
 
+      <Route path="/mall" element={<CataloguePage />} />
+      <Route path="/item/:id" element={<ItemPage />} />
+      <Route path="/sell" element={<SellPage />} />
+      <Route path="/saved" element={<ProtectedRoute><SavedPage /></ProtectedRoute>} />
+      <Route path="/merchant" element={<ProtectedRoute><MerchantPage /></ProtectedRoute>} />
+      <Route path="/merchant/:id" element={<ProtectedRoute><MerchantPage /></ProtectedRoute>} />
       {/* Auth — guests only */}
       <Route path="/login"    element={<GuestRoute><LoginPage /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
 
       {/* Protected — must be logged in */}
-      <Route path="/cart"        element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+      <Route path="/cart"        element={<CartPage />} />
       <Route path="/my-orders"   element={<ProtectedRoute><MyOrdersPage /></ProtectedRoute>} />
       <Route path="/my-bookings" element={<ProtectedRoute><MyBookingsPage /></ProtectedRoute>} />
       <Route path="/profile"     element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
@@ -47,6 +60,7 @@ export default function App() {
       {/* Admin — nested under AdminLayout with sidebar */}
       <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
         <Route index              element={<AdminDashboard />} />
+        <Route path="applications" element={<AdminApplications />} />
         <Route path="businesses"  element={<AdminBusinesses />} />
         <Route path="orders"      element={<AdminOrders />} />
         <Route path="bookings"    element={<AdminBookings />} />
@@ -56,6 +70,6 @@ export default function App() {
 
       {/* 404 */}
       <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    </Routes></SavedProvider>
   )
 }

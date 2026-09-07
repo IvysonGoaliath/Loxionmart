@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { Plus, Pencil, Trash2, X, Check, Star, ToggleLeft, ToggleRight } from 'lucide-react'
 import { toast } from 'react-hot-toast'
@@ -167,9 +168,7 @@ export default function AdminBusinesses() {
                   </td>
                   <td>
                     <div className={styles.actions}>
-                      <button className="btn btn-secondary btn-sm" onClick={() => setServicesModal(biz)}>
-                        Services
-                      </button>
+                      <Link className="btn btn-secondary btn-sm" to={`/merchant/${biz.id}`}>Catalogue & photos</Link>
                       <button className="btn btn-secondary btn-sm" disabled={updatingStatus !== null} onClick={() => openEdit(biz)}>
                         <Pencil size={13} />
                       </button>
