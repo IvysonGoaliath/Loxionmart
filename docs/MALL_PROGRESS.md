@@ -6,7 +6,9 @@ An online shopping mall for local South African businesses. One customer account
 ## Current batch: online mall foundation
 Status: LIVE on Render. Ivyson explicitly approved production deployment and additive migration 0003. PR #1 merged into main as `fa1c1303c87a81b89f13e8ec42f0b0718a5c21e7` on 2026-09-07. Both frontend and API deployments report success; read-only production checks passed. Implementation commit: `0d0d82e75f9225b1ede56bf1c0e10aaad47b70af`. Starting main commit: `363fb106ed260bfae08ee3707889567fb3c2d25a`. Payments remain disabled.
 
-## Current repair: shop application review
+## Current repair: shop application review — LIVE
+
+Release commit: `0906c8cfd27ac194a1f671c2bf383dd936cbbdb0`. Both Render services deployed successfully on 2026-09-07.
 Ivyson reported that applicants see In review while the administrator can only find the active/inactive toggle. Root causes: the admin sidebar was hidden below 768px with no mobile replacement; the business list omitted application status and review links; the existing review page labelled rejection only as Request changes.
 
 Implemented on top of `fa1c1303c87a81b89f13e8ec42f0b0718a5c21e7`:
@@ -16,7 +18,7 @@ Implemented on top of `fa1c1303c87a81b89f13e8ec42f0b0718a5c21e7`:
 - Admin business responses include review status. Application and visibility are distinct columns; pending/rejected shops link directly to review. A visibility update cannot approve a shop; the API rejects activation until approval.
 - No migration or new external service. Payment configuration is unchanged and disabled. Real shop decisions are left to Ivyson.
 
-Validation: 16 backend regression tests passed, including 3 new end-to-end API tests for rejection feedback/resubmission, decision/visibility separation and completed application filters. Production Vite build passed (local JS `index-Iy1R_Z3p.js`, CSS `index-Ct1MxOii.css`; deployment environment can change the JS hash). `git diff --check` passed. Browser interaction/visual QA has not been run. Publication verification is the remaining step for this repair.
+Validation: 16 backend regression tests passed, including 3 new end-to-end API tests for rejection feedback/resubmission, decision/visibility separation and completed application filters. Production Vite build passed (local JS `index-Iy1R_Z3p.js`, CSS `index-Ct1MxOii.css`; deployment environment can change the JS hash). `git diff --check` passed. Browser interaction/visual QA has not been run. Production verification also passed: frontend deployment 6305711429 succeeded at 09:23:12 UTC and API deployment 6305711436 at 09:24:21 UTC. The served frontend bundle `/assets/index-Cr0Pm9T0.js` includes the explicit rejection controls, review page, status filters and motto. Live OpenAPI exposes the application status filter and ManagedShop admin response. Health is HTTP 200 in production, and `/api/mall-config` still reports payments disabled. No actual application was approved or rejected during verification; Ivyson makes real business decisions.
 
 Deliver this complete batch:
 - Product/service catalogue with query, type, category, location, price, availability, sorting and pagination.
@@ -86,7 +88,7 @@ The earlier automatic approval blocker is resolved: after being asked explicitly
 - Production verification was read-only HTTP and deployment-status inspection. Browser interaction/visual QA remains unperformed; do not claim otherwise.
 - The intended documentation-only checkpoint commit uses `[skip render]` to avoid another application deployment (Render reference: https://render.com/docs/deploys#skipping-an-auto-deploy).
 
-### Checkpoint sync still pending
-The application release is live, but the subsequent GitHub update of this file was rejected by automatic approval review because its usage limit was reached. The rejection was not a deployment failure. Ivyson confirmed approval again; this does not remove a service usage limit. This updated file is available locally for the handoff. Remote main remains the successful release commit above, with the older checkpoint text. Once normal tool availability returns, fetch main and the current blob SHA, sync this updated checkpoint with a documentation-only `[skip render]` commit, and do not redeploy or rerun the migration just to update these notes.
+### Earlier checkpoint sync — resolved
+The first documentation sync after the mall foundation release was blocked by an automatic approval-review usage limit. After normal tool availability returned, the saved continuation notes were included in the application-review repair commit `0906c8cfd27ac194a1f671c2bf383dd936cbbdb0`. The application deployment itself had already succeeded. Use a documentation-only `[skip render]` commit for this final verification record; no application redeploy or migration is needed for notes.
 
 Resume from current `main`, not the old working-tree baseline. The next useful batch is real merchant catalogue content and, if requested, a single complete customer/owner/admin browser walkthrough. Follow the engineering milestones above after addressing real findings. Preserve the motto, existing Canva Mart logo, approved records and deferred payment decision.
