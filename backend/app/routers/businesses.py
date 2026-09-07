@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from typing import List, Optional
 from app.core.database import get_db
 from app.models.business import Business, BusinessCategory
@@ -8,6 +8,11 @@ from app.routers.deps import require_admin
 import re
 
 router = APIRouter(prefix="/businesses", tags=["businesses"])
+
+def public_business(biz):
+    result = BusinessOut.model_validate(biz)
+    result.services = [s for s in result.services if s.is_available]
+    return result
 
 def slugify(name: str) -> str:
     slug = re.sub(r'[^\w\s-]', '', name.lower())
@@ -20,19 +25,19 @@ def list_businesses(
     featured: Optional[bool] = None,
     db: Session = Depends(get_db)
 ):
-    q = db.query(Business).filter(Business.is_active == True)
+    q = db.query(Business).options(selectinload(Business.services)).filter(Business.is_active == True, Business.approval_status == "approved")
     if category:
         q = q.filter(Business.category == category)
     if featured is not None:
         q = q.filter(Business.is_featured == featured)
-    return q.order_by(Business.is_featured.desc(), Business.name).all()
+    return [public_business(b) for b in q.order_by(Business.is_featured.desc(), Business.name).all()]
 
 @router.get("/{slug}", response_model=BusinessOut)
 def get_business(slug: str, db: Session = Depends(get_db)):
-    biz = db.query(Business).filter(Business.slug == slug, Business.is_active == True).first()
+    biz = db.query(Business).filter(Business.slug == slug, Business.is_active == True, Business.approval_status == "approved").first()
     if not biz:
         raise HTTPException(status_code=404, detail="Business not found")
-    return biz
+    return public_business(biz)
 
 @router.post("/", response_model=BusinessOut, status_code=201)
 def create_business(data: BusinessCreate, db: Session = Depends(get_db), admin=Depends(require_admin)):

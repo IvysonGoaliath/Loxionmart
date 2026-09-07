@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import datetime
 from app.models.business import BusinessCategory
@@ -27,7 +27,21 @@ class BusinessUpdate(BaseModel):
     is_featured: Optional[bool] = None
     is_active: Optional[bool] = None
 
-class BusinessOut(BaseModel):
+class ShopPresentation(BaseModel):
+    logo_url: Optional[str] = None
+    cover_url: Optional[str] = None
+    opening_hours: Optional[str] = Field(default=None, max_length=1000)
+    collection_info: Optional[str] = Field(default=None, max_length=2000)
+    delivery_info: Optional[str] = Field(default=None, max_length=2000)
+    returns_info: Optional[str] = Field(default=None, max_length=3000)
+
+    @field_validator("logo_url", "cover_url")
+    @classmethod
+    def validate_image(cls, value):
+        from .media import image_url
+        return image_url(value)
+
+class BusinessOut(ShopPresentation):
     id: int
     name: str
     slug: str

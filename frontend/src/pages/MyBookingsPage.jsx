@@ -19,7 +19,7 @@ export default function MyBookingsPage() {
   return (
     <>
       <Navbar />
-      <main className={styles.main}>
+      <main id="mall-content" className={styles.main}>
         <div className="container">
           <h1 className={styles.title}>My Bookings</h1>
           {loading ? <PageLoader /> : bookings.length === 0 ? (

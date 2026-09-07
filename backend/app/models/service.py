@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, Float, ForeignKey, Enum
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, Float, ForeignKey, Enum, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
@@ -20,6 +20,11 @@ class Service(Base):
     service_type = Column(Enum(ServiceType), default=ServiceType.BOOKING)
     is_available = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    image_urls = Column(JSON, nullable=False, default=list, server_default="[]")
+    specifications = Column(JSON, nullable=False, default=dict, server_default="{}")
+    stock_quantity = Column(Integer, nullable=True)
+    duration_minutes = Column(Integer, nullable=True)
 
     business = relationship("Business", back_populates="services")
     order_items = relationship("OrderItem", back_populates="service")

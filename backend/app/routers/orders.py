@@ -4,7 +4,8 @@ from typing import List
 from datetime import datetime
 from app.core.database import get_db
 from app.models.order import Order, OrderItem, OrderStatus
-from app.models.service import Service
+from app.models.service import Service, ServiceType
+from app.core.config import settings
 from app.models.business import Business
 from app.models.commission import Commission
 from app.schemas.order import OrderCreate, OrderOut
@@ -17,7 +18,9 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 
 @router.post("/", response_model=OrderOut, status_code=201)
 async def create_order(data: OrderCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    biz = db.query(Business).filter(Business.id == data.business_id, Business.is_active == True).first()
+    if not settings.PAYMENTS_ENABLED:
+        raise HTTPException(503,"Online checkout is not open yet. Your basket can be saved while you browse.")
+    biz = db.query(Business).filter(Business.id == data.business_id, Business.is_active == True, Business.approval_status=="approved").first()
     if not biz:
         raise HTTPException(status_code=404, detail="Business not found")
 
@@ -25,8 +28,10 @@ async def create_order(data: OrderCreate, db: Session = Depends(get_db), user: U
     subtotal = 0.0
     for cart_item in data.items:
         svc = db.query(Service).filter(Service.id == cart_item.service_id, Service.business_id == data.business_id).first()
-        if not svc:
+        if not svc or not svc.is_available or svc.service_type != ServiceType.PRODUCT:
             raise HTTPException(status_code=404, detail=f"Service {cart_item.service_id} not found")
+        if svc.stock_quantity is not None and svc.stock_quantity < cart_item.quantity:
+            raise HTTPException(409,f"Not enough stock for {svc.name}")
         total = svc.price * cart_item.quantity
         subtotal += total
         items.append(OrderItem(service_id=svc.id, quantity=cart_item.quantity, unit_price=svc.price, total_price=total))

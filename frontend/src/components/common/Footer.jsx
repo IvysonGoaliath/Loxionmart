@@ -1,43 +1,5 @@
-import BrandLogo from './BrandLogo'
 import { Link } from 'react-router-dom'
-import styles from './Footer.module.css'
-
+import BrandLogo from './BrandLogo'
 export default function Footer() {
-  return (
-    <footer className={styles.footer}>
-      <div className={`container ${styles.inner}`}>
-        <div className={styles.brand}>
-          <BrandLogo />
-          <p className={styles.sub}>Supporting local businesses across Mzansi.</p>
-        </div>
-        <div className={styles.col}>
-          <div className={styles.colTitle}>Browse</div>
-          <Link to="/browse?cat=hair_beauty"   className={styles.colLink}>Hair & Beauty</Link>
-          <Link to="/browse?cat=phones_tech"   className={styles.colLink}>Phones & Tech</Link>
-          <Link to="/browse?cat=food_catering" className={styles.colLink}>Food & Catering</Link>
-          <Link to="/browse?cat=home_services" className={styles.colLink}>Home Services</Link>
-        </div>
-        <div className={styles.col}>
-          <div className={styles.colTitle}>Account</div>
-          <Link to="/login"        className={styles.colLink}>Sign in</Link>
-          <Link to="/register"     className={styles.colLink}>Join free</Link>
-          <Link to="/my-orders"    className={styles.colLink}>My Orders</Link>
-          <Link to="/my-bookings"  className={styles.colLink}>My Bookings</Link>
-        </div>
-        <div className={styles.col}>
-          <div className={styles.colTitle}>Business</div>
-          <Link to="/browse" className={styles.colLink}>Discover businesses</Link>
-          <a href="/#how-it-works" className={styles.colLink}>How it works</a>
-        </div>
-      </div>
-      <div className={styles.bottom}>
-        <div className="container">
-          <span>© {new Date().getFullYear()} Loxion Mart · Shop Local, Shop Lekker 🇿🇦</span>
-          <span className={styles.bottomRight}>
-            Made for the neighbourhood.
-          </span>
-        </div>
-      </div>
-    </footer>
-  )
+  return <footer className="mall-footer"><div className="container mall-footer-grid"><div><Link className="mall-footer-brand" to="/"><BrandLogo/></Link><h2>Shop Local,<br/>Shop Lekker!</h2><p>Your local shopping mall. Online.</p></div><div><h3>Explore the mall</h3><Link to="/mall?kind=product">Shop products</Link><Link to="/mall?kind=booking">Book services</Link><Link to="/browse">Visit the shops</Link><Link to="/mall?sort=newest">New arrivals</Link></div><div><h3>Your corner</h3><Link to="/saved">Saved & followed</Link><Link to="/my-orders">My orders</Link><Link to="/my-bookings">My bookings</Link><Link to="/profile">My account</Link></div><div><h3>For local businesses</h3><Link to="/sell">Open your shop</Link><Link to="/merchant">Shop workspace</Link><a href="/#how-it-works">How the mall works</a><p>Local shops. Real people.<br/>One place to discover them.</p></div></div><div className="container mall-footer-base">© {new Date().getFullYear()} Loxion Mart <span>Made for local discovery.</span></div></footer>
 }

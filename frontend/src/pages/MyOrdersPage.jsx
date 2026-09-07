@@ -20,7 +20,7 @@ export default function MyOrdersPage() {
   return (
     <>
       <Navbar />
-      <main className={styles.main}>
+      <main id="mall-content" className={styles.main}>
         <div className="container">
           <h1 className={styles.title}>My Orders</h1>
           {loading ? <PageLoader /> : orders.length === 0 ? (

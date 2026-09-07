@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080  # 7 days
 
     # ── Ozow ──
+    PAYMENTS_ENABLED: bool = False
     OZOW_SITE_CODE: str = ""
     OZOW_PRIVATE_KEY: str = ""
     OZOW_API_KEY: str = ""

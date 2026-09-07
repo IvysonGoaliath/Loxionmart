@@ -1,43 +1,29 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Search, ArrowRight, ArrowUpRight, Scissors, Smartphone, Utensils, Wrench, Shirt, Store } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { ArrowRight, ShoppingBag, CalendarDays, Store, Heart, MapPin, CheckCircle2 } from 'lucide-react'
 import Navbar from '../components/common/Navbar'
 import Footer from '../components/common/Footer'
-import BusinessCard from '../components/common/BusinessCard'
+import ItemCard from '../components/mall/ItemCard'
+import ShopCard from '../components/mall/ShopCard'
+import AsyncState from '../components/mall/AsyncState'
+import { useSaved } from '../components/mall/SavedProvider'
+import { recentIds } from '../utils/mall'
 import api from '../utils/api'
-import styles from './HomePage.module.css'
-const CATEGORIES = [
-  {id:'hair_beauty',label:'Hair & Beauty',icon:Scissors}, {id:'phones_tech',label:'Phones & Tech',icon:Smartphone},
-  {id:'food_catering',label:'Food & Catering',icon:Utensils}, {id:'home_services',label:'Home Services',icon:Wrench},
-  {id:'fashion',label:'Fashion',icon:Shirt}, {id:'other',label:'More local finds',icon:Store},
-]
 export default function HomePage() {
-  const [businesses,setBusinesses]=useState([])
-  const [loading,setLoading]=useState(true)
-  const [error,setError]=useState(false)
-  const [search,setSearch]=useState('')
-  const navigate=useNavigate()
-  const load=()=>{setLoading(true);setError(false);api.get('/businesses/').then(r=>setBusinesses(r.data)).catch(()=>setError(true)).finally(()=>setLoading(false))}
-  useEffect(()=>{load()},[])
-  const featured=businesses.filter(b=>b.is_featured)
-  const picks=(featured.length?featured:businesses).slice(0,6)
-  return <><Navbar/><main>
-    <section className={styles.hero}><div className={`container ${styles.heroInner}`}>
-      <div className={styles.heroText}><span className={styles.eyebrow}><span/> YOUR LOCAL. ALL IN ONE PLACE.</span>
-        <h1>Good things.<br/>Great people.<br/><em>Right here.</em></h1>
-        <p className={styles.intro}>From your next fresh cut to your next favourite spot. Discover the businesses that make your loxion, your loxion.</p>
-        <form className={styles.searchBar} onSubmit={e=>{e.preventDefault();navigate(search.trim()?`/browse?q=${encodeURIComponent(search.trim())}`:'/browse')}}>
-          <Search size={20}/><input aria-label="Search local businesses" placeholder="What are you looking for?" value={search} onChange={e=>setSearch(e.target.value)}/><button type="submit" aria-label="Search businesses"><ArrowRight size={22}/></button>
-        </form>
-        <div className={styles.popular}>Try <Link to="/browse?cat=hair_beauty">Hair & beauty</Link><Link to="/browse?cat=food_catering">Something to eat</Link><Link to="/browse?cat=phones_tech">Tech</Link></div>
-      </div>
-      <div className={styles.brandPanel}><div className={styles.panelTop}><span>THE LOCAL EDIT</span><ArrowUpRight size={24}/></div><div className={styles.logoStage}><img src="/logo.png" alt="Loxion Mart — shop local, shop lekker"/></div><div className={styles.panelBottom}><span>A little closer.<br/><strong>A lot more local.</strong></span><Link to="/browse" aria-label="Explore the local marketplace"><ArrowRight size={24}/></Link></div></div>
-    </div></section>
-    <section className={styles.categories}><div className="container"><div className={styles.sectionHead}><div><span className={styles.kicker}>FIND YOUR EVERYDAY</span><h2>What’s your thing?</h2></div><Link to="/browse" className={styles.textLink}>Explore everything <ArrowUpRight size={18}/></Link></div><div className={styles.catGrid}>{CATEGORIES.map(({id,label,icon:Icon},i)=><Link key={id} to={`/browse?cat=${id}`} className={styles.catCard}><span className={styles.catNumber}>0{i+1}</span><Icon size={27} strokeWidth={1.5}/><span>{label}</span><ArrowUpRight size={16}/></Link>)}</div></div></section>
-    <section className={styles.section}><div className="container"><div className={styles.sectionHead}><div><span className={styles.kicker}>MEET YOUR LOCAL BUSINESSES</span><h2>{featured.length?'In the neighbourhood.':'Local starts here.'}</h2></div><Link to="/browse" className={styles.textLink}>Browse all <ArrowRight size={18}/></Link></div>
-    {loading?<p role="status" className={styles.status}>Finding your local businesses…</p>:error?<div role="alert" className={styles.status}>We couldn’t load businesses. <button className="btn btn-secondary" onClick={load}>Try again</button></div>:picks.length?<div className={styles.bizGrid}>{picks.map(biz=><BusinessCard key={biz.id} biz={biz}/>)}</div>:<p className={styles.status}>The neighbourhood is growing. Check back soon for local businesses.</p>}
-    </div></section>
-    <section id="how-it-works" className={styles.how}><div className="container"><span className={styles.kicker}>LESS SEARCHING. MORE LOCAL.</span><div className={styles.howLayout}><h2>Your next local find.<br/>Three simple steps.</h2><div className={styles.steps}>{[['Discover','Find a business by category, name or location.'],['Explore','Browse its products and services, and find something for you.'],['Connect','Request an appointment or use the business’s listed contact details.']].map(([title,desc],i)=><div className={styles.step} key={title}><span>0{i+1}</span><div><h3>{title}</h3><p>{desc}</p></div></div>)}</div></div></div></section>
-    <section className={styles.cta}><div className={`container ${styles.ctaInner}`}><div><span className={styles.kicker}>SHOP LOCAL. SHOP LEKKER.</span><h2>Your neighbourhood<br/>has a lot to offer.</h2></div><Link to="/browse" className="btn btn-primary btn-lg">Find your next favourite <ArrowUpRight size={19}/></Link></div></section>
-  </main><Footer/></>
+  const [data,setData] = useState({ products:[], services:[], shops:[] }), [state,setState] = useState('loading'), [recent,setRecent] = useState([])
+  const saved = useSaved()
+  async function load() {
+    setState('loading')
+    try { const [p,s,b] = await Promise.all([api.get('/catalogue?kind=product&page_size=8'), api.get('/catalogue?kind=booking&page_size=4'), api.get('/catalogue/shops?page_size=4')]); setData({ products:p.data.items,services:s.data.items,shops:b.data.items }); setState('ready') } catch { setState('error') }
+  }
+  useEffect(() => { load(); Promise.allSettled(recentIds().map(id=>api.get(`/catalogue/${id}`))).then(results=>setRecent(results.filter(r=>r.status==='fulfilled').map(r=>r.value.data).slice(0,4))) }, [])
+  return <><Navbar/><main id="mall-content"><div className="container"><section className="mall-welcome"><div><span className="mall-eyebrow">YOUR LOCAL SHOPPING MALL. ONLINE.</span><h1>Shop Local,<br/><em>Shop Lekker!</em></h1><p>Products you need. Services you love.<br/>Local shops, all in one place.</p><div className="mall-hero-links"><Link className="btn btn-primary" to="/mall">Explore the mall <ArrowRight size={17}/></Link><Link className="mall-text-link" to="/sell">Bring your shop online</Link></div></div><img src="/mall-storefronts.webp" alt="An illustrated row of local shops representing the Loxion Mart online mall" width="1536" height="1024" fetchPriority="high"/></section>
+  <nav className="mall-entrances" aria-label="Start shopping"><Link to="/mall?kind=product"><ShoppingBag size={23}/><span><strong>Shop products</strong><small>Find your next local buy</small></span><ArrowRight size={19}/></Link><Link to="/mall?kind=booking"><CalendarDays size={23}/><span><strong>Book a service</strong><small>Make time for what you need</small></span><ArrowRight size={19}/></Link><Link to="/browse"><Store size={23}/><span><strong>Explore the shops</strong><small>Meet your local businesses</small></span><ArrowRight size={19}/></Link></nav>
+  <section className="mall-section"><div className="mall-section-head"><div><span className="mall-eyebrow">FRESH FROM OUR SHOPS</span><h2>On the shelves</h2></div><Link to="/mall?kind=product">All products <ArrowRight size={17}/></Link></div><AsyncState loading={state==='loading'} error={state==='error'} empty={!data.products.length} retry={load}><div className="mall-item-grid">{data.products.map((item,i)=><ItemCard key={item.id} item={item} eager={i<4}/>)}</div></AsyncState></section>
+  <section className="mall-collection-callout"><div className="mall-collection-icon"><Heart size={28}/></div><div><span className="mall-eyebrow">MAKE THIS MALL YOURS</span><h2>Your favourites, all together.</h2><p>Save something you love. Follow a shop. Pick up where you left off.</p></div><Link to="/saved" className="btn btn-secondary">{saved.keys.length ? `Your collection (${saved.keys.length})` : 'Start your collection'} <ArrowRight size={17}/></Link></section>
+  <section className="mall-section"><div className="mall-section-head"><div><span className="mall-eyebrow">MORE THAN SHOPPING</span><h2>Good people. Great services.</h2></div><Link to="/mall?kind=booking">All services <ArrowRight size={17}/></Link></div><AsyncState loading={state==='loading'} error={state==='error'} empty={!data.services.length} retry={load}><div className="mall-item-grid">{data.services.map(item=><ItemCard key={item.id} item={item}/>)}</div></AsyncState></section>
+  {recent.length>0&&<section className="mall-section"><div className="mall-section-head"><div><span className="mall-eyebrow">YOUR RECENT DISCOVERIES</span><h2>Take another look</h2></div><button className="mall-text-link" onClick={()=>{localStorage.removeItem('loxion-recent');setRecent([])}}>Clear recent history</button></div><p className="mall-muted mall-section-note">Recently viewed on this device.</p><div className="mall-item-grid">{recent.map(item=><ItemCard key={item.id} item={item}/>)}</div></section>}
+  <section className="mall-section"><div className="mall-section-head"><div><span className="mall-eyebrow">EVERY SHOP HAS A STORY</span><h2>Step into a local shop</h2></div><Link to="/browse">All shops <ArrowRight size={17}/></Link></div><AsyncState loading={state==='loading'} error={state==='error'} empty={!data.shops.length} retry={load}><div className="mall-shop-grid">{data.shops.map(shop=><ShopCard key={shop.id} shop={shop}/>)}</div></AsyncState></section>
+  <section id="how-it-works" className="mall-how"><div><ShoppingBag/><h3>Browse before you join</h3><p>Explore shops, compare listings and read the details freely.</p></div><div><Heart/><h3>One account. Your mall.</h3><p>Keep favourites and followed shops together across devices.</p></div><div><CalendarDays/><h3>Connect with the shop</h3><p>Request a service appointment or ask about an item. Online payments will follow.</p></div></section>
+  <section className="mall-owner-callout"><div><span className="mall-eyebrow">SMALL BUSINESS. BIG LOCAL ENERGY.</span><h2>Your shop belongs<br/>in this mall.</h2><p>A storefront for your products, your services and your story.</p></div><Link to="/sell" className="btn btn-light">Open your shop <ArrowRight size={19}/></Link></section></div></main><Footer/></>
 }

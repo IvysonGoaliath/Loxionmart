@@ -4,7 +4,7 @@ from typing import List
 from datetime import datetime
 from app.core.database import get_db
 from app.models.booking import Booking, BookingStatus
-from app.models.service import Service
+from app.models.service import Service, ServiceType
 from app.models.business import Business
 from app.schemas.booking import BookingCreate, BookingUpdate, BookingOut
 from app.routers.deps import get_current_user, require_admin
@@ -15,13 +15,16 @@ router = APIRouter(prefix="/bookings", tags=["bookings"])
 
 @router.post("/", response_model=BookingOut, status_code=201)
 def create_booking(data: BookingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    biz = db.query(Business).filter(Business.id == data.business_id, Business.is_active == True).first()
+    biz = db.query(Business).filter(Business.id == data.business_id, Business.is_active == True, Business.approval_status == "approved").first()
     if not biz:
         raise HTTPException(status_code=404, detail="Business not found")
 
     service = None
     if data.service_id:
-        service = db.query(Service).filter(Service.id == data.service_id).first()
+        service = db.query(Service).filter(Service.id == data.service_id, Service.business_id == data.business_id, Service.is_available.is_(True), Service.service_type == ServiceType.BOOKING).first()
+        if not service: raise HTTPException(404,"Bookable service not found in this shop")
+    if data.preferred_date and data.preferred_date.timestamp() <= datetime.now().timestamp():
+        raise HTTPException(422,"Choose a date and time in the future")
 
     booking = Booking(
         client_id=user.id,

@@ -1,136 +1,16 @@
-import BusinessCard from '../components/common/BusinessCard'
-import { useState, useEffect } from 'react'
+import { useEffect,useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import { Search, SlidersHorizontal, X, ArrowRight, MapPin } from 'lucide-react'
+import { Search } from 'lucide-react'
 import Navbar from '../components/common/Navbar'
 import Footer from '../components/common/Footer'
-import PageLoader from '../components/common/PageLoader'
-import EmptyState from '../components/common/EmptyState'
+import ShopCard from '../components/mall/ShopCard'
+import AsyncState from '../components/mall/AsyncState'
+import { categories } from '../utils/mall'
 import api from '../utils/api'
-import { categoryLabel, categoryEmoji, truncate } from '../utils/format'
-import styles from './BrowsePage.module.css'
-
-const CATEGORIES = [
-  { id: '', label: 'All' },
-  { id: 'hair_beauty',   label: 'Hair & Beauty',   emoji: '💇' },
-  { id: 'phones_tech',   label: 'Phones & Tech',   emoji: '📱' },
-  { id: 'food_catering', label: 'Food & Catering', emoji: '🍲' },
-  { id: 'home_services', label: 'Home Services',   emoji: '🔧' },
-  { id: 'fashion',       label: 'Fashion',          emoji: '👗' },
-  { id: 'other',         label: 'Other',            emoji: '🏪' },
-]
-
-export default function BrowsePage() {
-  const [params, setParams] = useSearchParams()
-  const [businesses, setBusinesses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [search, setSearch] = useState(params.get('q') || '')
-
-  const activeCat = params.get('cat') || ''
-
-  useEffect(() => {
-    setLoading(true)
-    setError(false)
-    const url = activeCat ? `/businesses/?category=${activeCat}` : '/businesses/'
-    api.get(url).then(r => setBusinesses(r.data)).catch(() => setError(true)).finally(() => setLoading(false))
-  }, [activeCat])
-
-  const filtered = businesses.filter(b => {
-    if (params.get('featured') === 'true' && !b.is_featured) return false
-    if (!search.trim()) return true
-    const q = search.toLowerCase()
-    return (
-      b.name.toLowerCase().includes(q) ||
-      (b.description || '').toLowerCase().includes(q) ||
-      (b.location || '').toLowerCase().includes(q)
-    )
-  })
-
-  const setCategory = (cat) => {
-    const next = new URLSearchParams(params)
-    if (cat) next.set('cat', cat); else next.delete('cat')
-    next.delete('q')
-    next.delete('featured')
-    setSearch('')
-    setParams(next)
-  }
-
-  const clearSearch = () => setSearch('')
-
-  return (
-    <>
-      <Navbar />
-      <main className={styles.main}>
-        {/* ── Browse header ── */}
-        <div className={styles.header}>
-          <div className="container">
-            <h1 className={styles.title}>
-              {activeCat ? `${categoryEmoji(activeCat)} ${categoryLabel(activeCat)}` : 'Browse all businesses'}
-            </h1>
-            <p className={styles.sub}>
-              {loading ? 'Loading...' : `${filtered.length} business${filtered.length !== 1 ? 'es' : ''} found`}
-            </p>
-          </div>
-        </div>
-
-        <div className="container">
-          {/* ── Search bar ── */}
-          <div className={styles.searchWrap}>
-            <div className={styles.searchBar}>
-              <Search size={16} className={styles.searchIcon} />
-              <input
-                type="text"
-                aria-label="Search businesses"
-                placeholder="Search by name, service or location..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className={styles.searchInput}
-              />
-              {search && (
-                <button aria-label="Clear search" className={styles.clearBtn} onClick={clearSearch}>
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* ── Category pills ── */}
-          <div className={styles.pills}>
-            {CATEGORIES.map(c => (
-              <button
-                aria-pressed={activeCat === c.id}
-                key={c.id}
-                className={`${styles.pill} ${activeCat === c.id ? styles.pillActive : ''}`}
-                onClick={() => setCategory(c.id)}
-              >
-                {c.emoji && <span>{c.emoji}</span>} {c.label}
-              </button>
-            ))}
-          </div>
-
-          {/* ── Results ── */}
-          {loading ? (
-            <PageLoader message="Finding businesses..." />
-          ) : error ? (<EmptyState emoji="" title="Businesses are taking a little longer" message="Please refresh to try again." />) : filtered.length === 0 ? (
-            <EmptyState
-              emoji="🔍"
-              title="No businesses found"
-              message={search ? `No results for "${search}". Try a different search or category.` : 'No businesses in this category yet.'}
-              action={<button className="btn btn-primary" onClick={() => { clearSearch(); setCategory('') }}>Clear filters</button>}
-            />
-          ) : (
-            <div className={styles.grid}>
-              {filtered
-                .sort((a, b) => (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0))
-                .map(biz => (
-                  <BusinessCard key={biz.id} biz={biz} />
-                ))}
-            </div>
-          )}
-        </div>
-      </main>
-      <Footer />
-    </>
-  )
+export default function BrowsePage(){
+ const [params,setParams]=useSearchParams(),[data,setData]=useState({items:[],total:0}),[state,setState]=useState('loading'),[query,setQuery]=useState(params.get('q')||''),[retry,setRetry]=useState(0)
+ const cat=params.get('cat')||'',page=Number(params.get('page'))||1,key=params.toString()
+ useEffect(()=>{setQuery(params.get('q')||'');const controller=new AbortController();setState('loading');api.get('/catalogue/shops',{params:{q:params.get('q')||'',category:cat||undefined,page,page_size:24},signal:controller.signal}).then(r=>{setData(r.data);setState('ready')}).catch(e=>{if(e.code!=='ERR_CANCELED')setState('error')});return()=>controller.abort()},[key,retry])
+ const change=(values)=>{const next=new URLSearchParams(params);next.delete('page');Object.entries(values).forEach(([k,v])=>v?next.set(k,v):next.delete(k));setParams(next)}
+ return <><Navbar/><main id="mall-content" className="container mall-main"><div className="mall-page-heading"><span className="mall-eyebrow">THE SHOP DIRECTORY</span><h1>Many shops. One local mall.</h1><p>Step inside a shop to discover its products, services and story.</p></div><form className="mall-catalogue-search" onSubmit={e=>{e.preventDefault();change({q:query.trim()})}}><Search size={20}/><input aria-label="Search shops" placeholder="Find a shop by name or location…" value={query} onChange={e=>setQuery(e.target.value)}/><button type="submit" className="btn btn-primary">Search</button></form><div className="mall-tablinks"><button aria-pressed={!cat} className={!cat?'selected':''} onClick={()=>change({cat:''})}>All shops</button>{categories.map(c=><button key={c.id} aria-pressed={cat===c.id} className={cat===c.id?'selected':''} onClick={()=>change({cat:c.id})}>{c.label}</button>)}</div><p className="mall-result-count" role="status">{state==='ready'?`${data.total} shops to explore`:'Finding shops…'}</p><AsyncState loading={state==='loading'} error={state==='error'} empty={!data.items.length} retry={()=>setRetry(x=>x+1)}><div className="mall-shop-grid">{data.items.map(shop=><ShopCard key={shop.id} shop={shop}/>)}</div></AsyncState>{data.total>24&&<nav className="mall-pagination" aria-label="Shop pages"><button className="btn btn-secondary" disabled={page<=1} onClick={()=>{setParams(p=>{p.set('page',String(page-1));return p});window.scrollTo({top:0})}}>Previous</button><span>Page {page} of {Math.ceil(data.total/24)}</span><button className="btn btn-secondary" disabled={page*24>=data.total} onClick={()=>{setParams(p=>{p.set('page',String(page+1));return p});window.scrollTo({top:0})}}>Next</button></nav>}<section className="mall-collection-callout"><div><h2>Is your shop missing?</h2><p>Give your local business a home in the mall.</p></div><Link to="/sell" className="btn btn-primary">Open your shop</Link></section></main><Footer/></>
 }

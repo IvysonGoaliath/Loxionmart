@@ -6,7 +6,7 @@ import logging
 
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.routers import auth, users, businesses, services, bookings, orders, admin
+from app.routers import auth, users, businesses, services, bookings, orders, admin, catalogue, merchant, saved, media
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("loxionmart")
@@ -63,6 +63,13 @@ app.include_router(services.router,   prefix="/api")
 app.include_router(bookings.router,   prefix="/api")
 app.include_router(orders.router,     prefix="/api")
 app.include_router(admin.router,      prefix="/api")
+
+for mall_router in (catalogue.router, merchant.router, saved.router, media.router):
+    app.include_router(mall_router, prefix="/api")
+
+@app.get("/api/mall-config")
+def mall_config():
+    return {"payments_enabled": settings.PAYMENTS_ENABLED}
 
 # ── Health check ──
 @app.get("/api/health")
