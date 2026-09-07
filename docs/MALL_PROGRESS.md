@@ -4,7 +4,7 @@
 An online shopping mall for local South African businesses. One customer account, many shops, real products and bookable services. Motto: **Shop Local, Shop Lekker!** Keep it prominent in the home page and shared brand/navigation. Preserve the Canva Loxion Mart logo, black/cream/green identity, GitHub repo and Render setup. Ozow/payment activation is deferred until Ivyson has the business bank account.
 
 ## Current batch: online mall foundation
-Status: implementation complete; automated checks passed; publication pending. Working branch: `mall-foundation`. Starting main commit: `363fb106ed260bfae08ee3707889567fb3c2d25a`.
+Status: implementation complete and tested; saved on mall-foundation at 0d0d82e75f9225b1ede56bf1c0e10aaad47b70af. PRODUCTION PUBLICATION BLOCKED pending explicit approval. Working branch: `mall-foundation`. Starting main commit: `363fb106ed260bfae08ee3707889567fb3c2d25a`.
 
 Deliver this complete batch:
 - Product/service catalogue with query, type, category, location, price, availability, sorting and pagination.
@@ -58,3 +58,7 @@ Add actual product/service photos and specifications for real shops through Admi
 
 ## Design implementation references
 W3C form labels and feedback: https://www.w3.org/WAI/tutorials/forms/ . Image sizing/loading: https://web.dev/learn/images/performance-issues . Applied as implementation guidance, not a claim of audited compliance. The mall storefront illustration is original generated brand artwork, served as a ~92 KB WebP; it is not photography of actual participating shops or inventory.
+
+
+## Publication approval blocker
+Automatic approval review rejected updating `main` to the mall foundation commit because the production branch triggers Render deployment and migration 0003, and it requires explicit approval for that exact action. The implementation is safely pushed on `mall-foundation`; main remains `363fb106ed260bfae08ee3707889567fb3c2d25a`. Do not retry or merge indirectly until Ivyson explicitly approves deployment of this batch and its additive database migration. A draft pull request makes the full changes reviewable. After approval, merge/update main with a non-forced operation, verify the Render API and frontend, then update this checkpoint with the result.
